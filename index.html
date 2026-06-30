@@ -171,23 +171,30 @@
     text-align: left;
   }
 
+  .benefit-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
   .benefit-card .icon-box {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
+    flex-shrink: 0;
   }
 
   .benefit-card .icon {
-    font-size: 34px;
+    font-size: 26px;
     line-height: 1;
   }
 
   .benefit-card .icon-img {
-    width: 34px;
-    height: 34px;
+    width: 26px;
+    height: 26px;
     object-fit: contain;
   }
 
@@ -197,7 +204,6 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: rgba(255,255,255,0.7);
-    margin-bottom: 6px;
   }
 
   .benefit-card .blurb {
@@ -331,13 +337,17 @@
     <!-- Benefits -->
     <div class="benefits">
       <div class="benefit-card">
-        <div class="icon-box"><span class="icon">🎡</span></div>
-        <div class="audience">For Fairgoers</div>
+        <div class="card-header">
+          <div class="icon-box"><span class="icon">🎡</span></div>
+          <div class="audience">For Fairgoers</div>
+        </div>
         <div class="blurb">Find the food, vendors &amp; fun across the fairgrounds, all in one place, with no guesswork.</div>
       </div>
       <div class="benefit-card">
-        <div class="icon-box"><img class="icon-img" src="https://raw.githubusercontent.com/FairFriendApp/Images/main/storefront.png" alt="Storefront icon"></div>
-        <div class="audience">For Vendors</div>
+        <div class="card-header">
+          <div class="icon-box"><img class="icon-img" src="https://raw.githubusercontent.com/FairFriendApp/Images/main/storefront.png" alt="Storefront icon"></div>
+          <div class="audience">For Vendors</div>
+        </div>
         <div class="blurb">Get discovered by fairgoers searching for exactly what you sell, right when they're nearby.</div>
       </div>
     </div>
