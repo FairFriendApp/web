@@ -236,7 +236,7 @@
       <a href="#experience">Experience</a>
       <a href="#revenue">Revenue</a>
       <a href="#plans">Plans</a>
-      <a class="btn btn-primary btn-sm" href="#demo">Book a Demo</a>
+      <a class="btn btn-primary btn-sm" href="#demo">Let&rsquo;s Talk</a>
       <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
         <svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         <svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -257,7 +257,7 @@
       <h1>Modernize the Fair Experience. <span>Add a New Revenue Stream.</span></h1>
       <p class="lede">Fair Friend is the free vendor-finder app for fairgoers, with partnership plans that start at <em>zero cost</em> to your fair.</p>
       <div class="hero-ctas">
-        <a class="btn btn-primary" href="#demo">Book a 15-Minute Demo</a>
+        <a class="btn btn-primary" href="#demo">Book a Demo</a>
         <a class="btn btn-ghost" href="#plans">See the Plans</a>
       </div>
       <p class="hero-note">Free for fairgoers on iPhone &amp; Android for the 2027 fair season.</p>
@@ -434,7 +434,7 @@
       <h2>Ready for your 2027 season.</h2>
     </div>
     <div class="steps">
-      <div class="step reveal"><h3>Book a demo</h3><p>See the app and the admin portal in 15 minutes, and pick the plan that fits your fair.</p></div>
+      <div class="step reveal"><h3>Book a demo</h3><p>See the app and the admin portal in action, and pick the plan that fits your fair.</p></div>
       <div class="step reveal"><h3>We set up your event</h3><p>We create your fair in Fair Friend, then invite your vendors to sign up for free and pin their location on the map.</p></div>
       <div class="step reveal"><h3>Open the gates</h3><p>Promote the app with signage and social posts, and watch fairgoers find your vendors faster.</p></div>
     </div>
@@ -444,13 +444,13 @@
 <section class="demo" id="demo">
   <div class="wrap">
     <div class="demo-copy reveal">
-      <span class="kicker" style="color:#FFD27A">Book a demo</span>
+      <span class="kicker" style="color:#FFD27A">Get in touch</span>
       <h2>See how it works for your fair.</h2>
-      <p>Tell us a little about your fair and we'll set up a 15-minute walkthrough of the fairgoer app, the vendor tools and the admin portal.</p>
+      <p>Have a question, or want to see Fair Friend in action? Tell us a little about your fair, and we'll follow up with answers or set up a walkthrough of the fairgoer app, the vendor tools and the admin portal.</p>
       <p class="contact">Prefer email? <a href="mailto:info@fairfriend.app">info@fairfriend.app</a></p>
     </div>
     <form id="demoForm" class="reveal" novalidate>
-      <h3>Request a demo</h3>
+      <h3>Send us a message</h3>
       <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" autocomplete="name" required></div>
       <div class="field"><label for="f-title">Title <span class="opt">(optional)</span></label><input id="f-title" name="title" autocomplete="organization-title"></div>
       <div class="field"><label for="f-fair">Fair name</label><input id="f-fair" name="fair" autocomplete="organization" required></div>
@@ -461,9 +461,9 @@
         </select></div>
       <div class="field"><label for="f-plan">Plan of interest</label>
         <select id="f-plan" name="plan"><option>Not sure yet</option><option>Co-Managed</option><option>Self-Managed</option></select></div>
-      <div class="field full"><label for="f-msg">Anything we should know? <span class="opt">(optional)</span></label><textarea id="f-msg" name="message" placeholder="Fair dates, number of vendors, questions…"></textarea></div>
+      <div class="field full"><label for="f-msg">Questions or comments? <span class="opt">(optional)</span></label><textarea id="f-msg" name="message" placeholder="Your questions, fair dates, number of vendors…"></textarea></div>
       <div class="hp" aria-hidden="true"><label>Leave blank<input name="website" tabindex="-1" autocomplete="off"></label></div>
-      <button class="btn btn-primary" type="submit">Request My Demo</button>
+      <button class="btn btn-primary" type="submit">Send Message</button>
       <p class="form-msg" id="formMsg" role="status"></p>
     </form>
   </div>
@@ -510,10 +510,10 @@
         const r = await fetch(DEMO_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(d) });
         if (!r.ok) throw new Error();
         form.reset();
-        msg.className = 'form-msg ok'; msg.textContent = "Thanks! We'll be in touch soon to schedule your demo.";
+        msg.className = 'form-msg ok'; msg.textContent = "Thanks! We'll be in touch soon.";
       } catch {
         msg.className = 'form-msg err'; msg.textContent = 'Something went wrong. Please email ' + DEMO_TO + '.';
-      } finally { btn.disabled = false; btn.textContent = 'Request My Demo'; }
+      } finally { btn.disabled = false; btn.textContent = 'Send Message'; }
       return;
     }
     const body = [
