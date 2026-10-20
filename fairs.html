@@ -217,6 +217,53 @@
   @media (max-width:900px){ .demo .wrap{ grid-template-columns:1fr; } }
   @media (max-width:520px){ form{ grid-template-columns:1fr; padding:26px 20px; } }
 
+  /* Break-even calculator */
+  .plan .calc-link{ display:inline-block; margin-top:10px; font-size:14px; font-weight:700; color:var(--sky); text-decoration:none; }
+  .plan .calc-link:hover{ text-decoration:underline; }
+  .calc-sec{ background:var(--tint); }
+  .calc{ max-width:1000px; margin:0 auto; background:#fff; border:1px solid var(--line); border-radius:24px; box-shadow:0 18px 44px rgba(8,25,45,.08);
+         display:grid; grid-template-columns:1.05fr .95fr; overflow:hidden; }
+  .calc-inputs{ padding:32px; }
+  .calc-tabs{ display:inline-flex; background:var(--tint); border:1px solid var(--line); border-radius:999px; padding:4px; margin-bottom:24px; }
+  .calc-tab{ font-family:inherit; font-size:14px; font-weight:700; color:var(--navy); background:transparent; border:0; border-radius:999px; padding:9px 18px; cursor:pointer; }
+  .calc-tab[aria-selected="true"]{ background:var(--navy); color:#fff; }
+  .calc-group + .calc-group{ margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
+  .calc-group h4{ font-size:12px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--orange); margin-bottom:12px; }
+  .calc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .calc-field{ display:flex; flex-direction:column; gap:6px; }
+  .calc-field small{ font-size:12px; color:var(--muted); line-height:1.4; }
+  .money{ position:relative; }
+  .money::before{ content:"$"; position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:600; font-size:15px; pointer-events:none; }
+  .money input{ padding-left:28px; }
+  .calc-results{ background:linear-gradient(180deg,var(--navy) 0%, #12345C 100%); color:#fff; padding:32px; display:flex; flex-direction:column; }
+  .calc-results h4{ font-size:12px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#FFC56B; }
+  .calc-big{ font-size:clamp(34px,4.4vw,46px); font-weight:800; line-height:1.1; margin-top:8px; }
+  .calc-big.neg{ color:#FF9B8A; }
+  .calc-sub{ margin-top:6px; font-size:14px; color:rgba(255,255,255,.78); }
+  .calc-rows{ margin-top:22px; display:grid; gap:10px; font-size:14.5px; }
+  .calc-row{ display:flex; justify-content:space-between; gap:12px; color:rgba(255,255,255,.88); }
+  .calc-row b{ color:#fff; font-weight:700; white-space:nowrap; }
+  .calc-row.total{ padding-top:10px; border-top:1px solid rgba(255,255,255,.18); }
+  .calc-bars{ margin-top:24px; display:grid; gap:12px; }
+  .bar-label{ display:flex; justify-content:space-between; font-size:12.5px; color:rgba(255,255,255,.75); margin-bottom:5px; }
+  .bar{ height:12px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden; }
+  .bar span{ display:block; height:100%; border-radius:999px; transition:width .35s ease; }
+  .bar .rev{ background:linear-gradient(90deg,var(--orange),#FFC56B); }
+  .bar .lic{ background:rgba(255,255,255,.55); }
+  .calc-note{ margin-top:auto; padding-top:22px; font-size:14px; color:rgba(255,255,255,.92); }
+  .calc-note .pill{ display:inline-block; font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; margin-bottom:8px; }
+  .pill.good{ background:rgba(47,126,92,.35); color:#9BE3BF; }
+  .pill.warn{ background:rgba(232,137,12,.25); color:#FFC56B; }
+  .calc-foot{ max-width:1000px; margin:18px auto 0; text-align:center; font-size:13px; color:var(--muted); }
+  .calc-empty-big{ font-size:clamp(22px,2.6vw,28px); font-weight:800; line-height:1.25; margin-top:10px; }
+  .calc-range{ width:100%; margin:12px 0 6px; accent-color:var(--orange); padding:0; border:0; height:24px; }
+  .calc-range:focus{ box-shadow:none; }
+  .calc-link-btn{ font-family:inherit; font-size:12px; font-weight:700; color:var(--sky); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; }
+  .calc-tip{ margin-top:12px; font-size:13px; color:var(--muted); background:var(--cream); border:1px solid #F1E3CC; border-radius:12px; padding:10px 12px; }
+  [hidden]{ display:none !important; }
+  @media (max-width:860px){ .calc{ grid-template-columns:1fr; } }
+  @media (max-width:480px){ .calc-inputs, .calc-results{ padding:24px 20px; } .calc-grid{ grid-template-columns:1fr; } }
+
   footer{ background:var(--navy); color:rgba(255,255,255,.75); padding:40px 0; font-size:14px; }
   footer .wrap{ display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center; }
   footer a{ color:#fff; text-decoration:none; margin-left:20px; }
@@ -236,6 +283,7 @@
       <a href="#experience">Experience</a>
       <a href="#revenue">Revenue</a>
       <a href="#plans">Plans</a>
+      <a href="#calculator">Calculator</a>
       <a class="btn btn-primary btn-sm" href="#demo">Let&rsquo;s Talk</a>
       <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
         <svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -247,6 +295,7 @@
     <a href="#experience">Experience</a>
     <a href="#revenue">Revenue</a>
     <a href="#plans">Plans</a>
+    <a href="#calculator">Calculator</a>
   </div>
 </nav>
 
@@ -414,6 +463,7 @@
         <p class="tag">You run it. You set the rates. You keep the proceeds.</p>
         <div class="price">1% <small>of prior-year attendance</small></div>
         <p class="price-note">Annual license, training and support included. Example: 250,000 attendees = $2,500 per year.</p>
+        <a class="calc-link" href="#calculator">Run the numbers for your fair &rarr;</a>
         <ul>
           <li>Your fair sets its own Featured and Premium rates</li>
           <li>Your fair keeps 100% of the revenue</li>
@@ -424,6 +474,148 @@
         <a class="btn btn-outline" href="#demo" data-plan="Self-Managed">Talk About Self-Managed</a>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="calc-sec" id="calculator">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Self-Managed break-even calculator</span>
+      <h2>Run the numbers<br>for your fair.</h2>
+      <p>Project your revenue, see how many upgrades you'd need to sell to cover the license, or work out the rates that hit your revenue goal.</p>
+    </div>
+
+    <div class="calc reveal" id="calc">
+      <div class="calc-inputs">
+        <div class="calc-tabs" role="tablist" aria-label="Calculator view">
+          <button class="calc-tab" type="button" role="tab" aria-selected="true" data-mode="projection">Projection</button>
+          <button class="calc-tab" type="button" role="tab" aria-selected="false" data-mode="quota">Quota</button>
+          <button class="calc-tab" type="button" role="tab" aria-selected="false" data-mode="pricing">Pricing</button>
+        </div>
+
+        <div class="calc-group">
+          <h4>Your fair</h4>
+          <div class="calc-grid">
+            <div class="calc-field">
+              <label for="c-att">Prior-year attendance</label>
+              <input id="c-att" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter attendance">
+              <small>License is 1%: <b id="c-lic-hint">&mdash;</b></small>
+            </div>
+            <div class="calc-field">
+              <label for="c-vendors">Approx. number of vendors</label>
+              <input id="c-vendors" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter vendors">
+            </div>
+            <div class="calc-field">
+              <label for="c-days">Fair days</label>
+              <input id="c-days" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter days">
+              <small><b id="c-slots-hint">&mdash;</b> featured slots (3 per day)</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-group" id="c-goal-wrap" hidden>
+          <h4>Your goal</h4>
+          <div class="calc-field">
+            <label for="c-target">Target revenue</label>
+            <div class="money"><input id="c-target" type="text" inputmode="decimal" autocomplete="off" placeholder="Enter attendance first"></div>
+            <input id="c-target-range" class="calc-range" type="range" min="0" max="10000" step="50" value="0" aria-label="Adjust target revenue">
+            <small><span id="c-target-net">Starts at break-even, the cost of your license.</span> <button type="button" class="calc-link-btn" id="c-target-reset" hidden>Reset to break-even</button></small>
+          </div>
+        </div>
+
+        <div class="calc-group">
+          <h4>Your rates</h4>
+          <div class="calc-grid">
+            <div class="calc-field">
+              <label for="c-prem">Premium listing <span class="opt">(per event)</span></label>
+              <div class="money"><input id="c-prem" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+            </div>
+            <div class="calc-field">
+              <label for="c-feat">Featured spot <span class="opt">(per slot)</span></label>
+              <div class="money"><input id="c-feat" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+            </div>
+          </div>
+          <p class="calc-tip" id="c-rates-tip" hidden>Enter the rate you&rsquo;re most sure of and leave the other blank. The calculator works out the rate you&rsquo;d need for the other.</p>
+        </div>
+
+        <div class="calc-group">
+          <h4>Expected sales</h4>
+          <div class="calc-grid">
+            <div class="calc-field" id="c-sold-wrap">
+              <label for="c-sold">Premium upgrades sold</label>
+              <input id="c-sold" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+              <small id="c-sold-pct">&nbsp;</small>
+            </div>
+            <div class="calc-field">
+              <label for="c-booked">Featured slots booked</label>
+              <input id="c-booked" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+              <small id="c-booked-pct">&nbsp;</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-results" aria-live="polite">
+        <!-- Empty state -->
+        <div id="r-empty" class="calc-empty">
+          <h4>Your results</h4>
+          <p class="calc-empty-big">Enter your fair&rsquo;s details to see your numbers.</p>
+          <p class="calc-sub" id="r-empty-sub">Add your prior-year attendance, number of vendors, fair days and at least one rate.</p>
+        </div>
+
+        <!-- Projection view -->
+        <div id="r-projection" hidden>
+          <h4>Projected net to your fair</h4>
+          <div class="calc-big" id="r-net">$0</div>
+          <p class="calc-sub" id="r-net-sub"></p>
+          <div class="calc-rows">
+            <div class="calc-row"><span id="r-prem-label">Premium</span><b id="r-prem">$0</b></div>
+            <div class="calc-row"><span id="r-feat-label">Featured</span><b id="r-feat">$0</b></div>
+            <div class="calc-row total"><span>Total revenue</span><b id="r-total">$0</b></div>
+            <div class="calc-row"><span>Annual license</span><b id="r-lic">&minus;$0</b></div>
+          </div>
+          <div class="calc-bars">
+            <div><div class="bar-label"><span>Revenue</span><span id="r-bar-rev-v">$0</span></div><div class="bar"><span class="rev" id="r-bar-rev"></span></div></div>
+            <div><div class="bar-label"><span>License</span><span id="r-bar-lic-v">$0</span></div><div class="bar"><span class="lic" id="r-bar-lic"></span></div></div>
+          </div>
+        </div>
+
+        <!-- Quota view -->
+        <div id="r-quota" hidden>
+          <h4>Premium upgrades needed to break even</h4>
+          <div class="calc-big" id="q-need">0</div>
+          <p class="calc-sub" id="q-need-sub"></p>
+          <div class="calc-rows">
+            <div class="calc-row"><span>Annual license</span><b id="q-lic">$0</b></div>
+            <div class="calc-row"><span id="q-feat-label">Featured revenue</span><b id="q-feat">$0</b></div>
+            <div class="calc-row total"><span>Left for Premium to cover</span><b id="q-left">$0</b></div>
+          </div>
+          <div class="calc-rows" style="margin-top:18px">
+            <div class="calc-row"><span>Premium alone covers it at</span><b id="q-prem-only"></b></div>
+            <div class="calc-row"><span>Featured alone covers it at</span><b id="q-feat-only"></b></div>
+          </div>
+        </div>
+
+        <!-- Pricing view -->
+        <div id="r-pricing" hidden>
+          <h4 id="p-head">Rates to hit your goal</h4>
+          <div class="calc-big" id="p-big">&mdash;</div>
+          <p class="calc-sub" id="p-sub"></p>
+          <div class="calc-rows">
+            <div class="calc-row"><span>Target revenue</span><b id="p-target">$0</b></div>
+            <div class="calc-row"><span>Annual license</span><b id="p-lic">&minus;$0</b></div>
+            <div class="calc-row total"><span>Net to your fair</span><b id="p-net">$0</b></div>
+          </div>
+          <div class="calc-rows" style="margin-top:18px">
+            <div class="calc-row"><span id="p-prem-only-label">Premium alone would need</span><b id="p-prem-only"></b></div>
+            <div class="calc-row"><span id="p-feat-only-label">Featured alone would need</span><b id="p-feat-only"></b></div>
+          </div>
+        </div>
+
+        <div class="calc-note" id="r-note"></div>
+      </div>
+    </div>
+    <p class="calc-foot">Estimates only. Your fair sets its own rates and keeps 100% of Premium and Featured revenue on the Self-Managed plan.</p>
   </div>
 </section>
 
@@ -568,6 +760,202 @@
     window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive:true });
     window.addEventListener('resize', () => { sizes(); update(); });
     sizes(); update();
+  })();
+
+  /* ── Break-even calculator ──
+     License = 1% of prior-year attendance. Featured slots = 3 per fair day.
+     Projection: revenue from expected sales minus the license.
+     Quota: given featured slots booked, how many Premium upgrades cover the rest. */
+  (function(){
+    const $ = id => document.getElementById(id);
+    const el = {
+      att:$('c-att'), vendors:$('c-vendors'), days:$('c-days'), prem:$('c-prem'), feat:$('c-feat'),
+      sold:$('c-sold'), booked:$('c-booked')
+    };
+    if (!el.att) return;
+    const usd = new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 });
+    const num = new Intl.NumberFormat('en-US');
+    // Accepts "356,000", "$45" or "356000"; blank returns NaN so we can tell it apart from zero.
+    const raw = input => parseFloat(String(input.value).replace(/[^0-9.]/g, ''));
+    const val = (input, min = 0) => { const n = raw(input); return isFinite(n) ? Math.max(min, n) : min; };
+    const filled = input => isFinite(raw(input)) && raw(input) > 0;
+    const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '0%';
+    const plural = (n, word) => num.format(n) + ' ' + word + (n === 1 ? '' : 's');
+    let mode = 'projection';
+    const target = $('c-target'), range = $('c-target-range');
+    let targetDirty = false;   // false = target follows the license (break-even)
+
+    function calc(){
+      const att = val(el.att), vendors = Math.round(val(el.vendors, 1)), days = Math.round(val(el.days, 1));
+      const prem = val(el.prem), feat = val(el.feat);
+      const slots = days * 3;
+      const license = Math.round(att * 0.01);
+      const sold = Math.min(Math.round(val(el.sold)), vendors);
+      const booked = Math.min(Math.round(val(el.booked)), slots);
+
+      $('c-lic-hint').textContent = filled(el.att) ? usd.format(license) : '—';
+      $('c-slots-hint').textContent = filled(el.days) ? num.format(slots) : '—';
+      $('c-sold-pct').innerHTML = filled(el.vendors) && el.sold.value !== ''
+        ? pct(sold, vendors) + ' of vendors' + (val(el.sold) > vendors ? ' (capped at vendor count)' : '') : '&nbsp;';
+      $('c-booked-pct').innerHTML = filled(el.days) && el.booked.value !== ''
+        ? pct(booked, slots) + ' of ' + num.format(slots) + ' slots' + (val(el.booked) > slots ? ' (capped)' : '') : '&nbsp;';
+
+      // Pricing goal: starts at break-even (the license) and follows attendance until the visitor changes it.
+      if (!targetDirty) target.value = filled(el.att) ? num.format(license) : '';
+      const goal = targetDirty ? val(target) : license;
+      const rangeMax = Math.max(1000, Math.ceil(Math.max(license * 5, goal) / 100) * 100);  // fixed scale so dragging doesn't stretch it
+      range.max = rangeMax;
+      range.step = Math.max(10, Math.round(rangeMax / 400 / 10) * 10);
+      range.value = goal;
+      range.disabled = !filled(el.att);
+      const goalNet = goal - license;
+      $('c-target-net').textContent = !filled(el.att) ? 'Starts at break-even, the cost of your license.'
+        : 'Net to your fair: ' + (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet)) + (goalNet === 0 ? ' (break-even)' : '') + '.';
+      $('c-target-reset').hidden = !targetDirty;
+
+      // Results wait until the fair's details are in, plus a rate (Projection, Quota) or expected sales (Pricing).
+      const base = filled(el.att) && filled(el.vendors) && filled(el.days);
+      const ready = mode === 'pricing' ? base && (sold > 0 || booked > 0) : base && (filled(el.prem) || filled(el.feat));
+      $('r-empty-sub').textContent = mode === 'pricing'
+        ? 'Add your prior-year attendance, number of vendors, fair days and how many upgrades you expect to sell.'
+        : 'Add your prior-year attendance, number of vendors, fair days and at least one rate.';
+      $('r-empty').hidden = ready;
+      $('r-projection').hidden = !ready || mode !== 'projection';
+      $('r-quota').hidden = !ready || mode !== 'quota';
+      $('r-pricing').hidden = !ready || mode !== 'pricing';
+      if (!ready) { $('r-note').innerHTML = ''; return; }
+
+      const featRev = booked * feat;
+      const note = $('r-note');
+
+      if (mode === 'projection') {
+        const premRev = sold * prem, total = premRev + featRev, net = total - license;
+        $('r-net').textContent = (net < 0 ? '−' : '') + usd.format(Math.abs(net));
+        $('r-net').classList.toggle('neg', net < 0);
+        $('r-net-sub').textContent = license > 0 ? 'Revenue covers ' + Math.round(total / license * 100) + '% of the license' : '';
+        $('r-prem-label').textContent = 'Premium (' + num.format(sold) + ' × ' + usd.format(prem) + ')';
+        $('r-feat-label').textContent = 'Featured (' + num.format(booked) + ' × ' + usd.format(feat) + ')';
+        $('r-prem').textContent = usd.format(premRev);
+        $('r-feat').textContent = usd.format(featRev);
+        $('r-total').textContent = usd.format(total);
+        $('r-lic').textContent = '−' + usd.format(license);
+        const max = Math.max(total, license, 1);
+        $('r-bar-rev').style.width = (total / max * 100) + '%';
+        $('r-bar-lic').style.width = (license / max * 100) + '%';
+        $('r-bar-rev-v').textContent = usd.format(total);
+        $('r-bar-lic-v').textContent = usd.format(license);
+        if (net >= 0) {
+          note.innerHTML = '<span class="pill good">Profitable</span><br>' +
+            (premRev >= license ? 'Premium sales alone cover the license, so every Featured slot is profit for your fair.'
+                                : 'Your fair clears the license and keeps the rest.');
+        } else {
+          const need = prem > 0 ? Math.ceil(-net / prem) : null;
+          note.innerHTML = '<span class="pill warn">Short of break-even</span><br>' +
+            (need !== null ? 'About ' + plural(need, 'more Premium upgrade') + ' would close the gap. Try the Quota view to set a target.'
+                           : 'Set a Premium or Featured rate to see your break-even point.');
+        }
+      } else if (mode === 'quota') {
+        const left = Math.max(0, license - featRev);
+        const need = prem > 0 ? Math.ceil(left / prem) : (left > 0 ? Infinity : 0);
+        $('q-lic').textContent = usd.format(license);
+        $('q-feat-label').textContent = 'Featured (' + num.format(booked) + ' × ' + usd.format(feat) + ')';
+        $('q-feat').textContent = usd.format(featRev);
+        $('q-left').textContent = usd.format(left);
+        $('q-need').textContent = isFinite(need) ? num.format(need) : '—';
+        $('q-need').classList.remove('neg');
+        $('q-need-sub').textContent = isFinite(need) ? pct(need, vendors) + ' of your ' + num.format(vendors) + ' vendors at ' + usd.format(prem) + ' each'
+                                                     : 'Set a Premium rate to see your quota';
+        const premOnly = prem > 0 ? Math.ceil(license / prem) : null;
+        const featOnly = feat > 0 ? Math.ceil(license / feat) : null;
+        $('q-prem-only').textContent = premOnly === null ? '—' : plural(premOnly, 'upgrade') + ' (' + pct(premOnly, vendors) + ')';
+        $('q-feat-only').textContent = featOnly === null ? '—' : plural(featOnly, 'slot') + (featOnly > slots ? ' (more than you have)' : ' of ' + num.format(slots));
+        if (left === 0) {
+          note.innerHTML = '<span class="pill good">Covered by Featured</span><br>Your featured bookings already cover the license, so every Premium upgrade is profit.';
+        } else if (isFinite(need) && need <= vendors) {
+          note.innerHTML = '<span class="pill good">Your sales target</span><br>Sell ' + plural(need, 'Premium upgrade') +
+            ' and book ' + plural(booked, 'featured slot') + ' to break even. Everything beyond that is profit.';
+        } else {
+          note.innerHTML = '<span class="pill warn">Not reachable at these rates</span><br>You would need more upgrades than you have vendors. Raise your rates or book more featured slots.';
+        }
+      } else {
+        // Pricing: solve for whichever rate is left blank so revenue reaches the goal.
+        $('p-target').textContent = usd.format(goal);
+        $('p-lic').textContent = '−' + usd.format(license);
+        $('p-net').textContent = (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet));
+        const premOnly = sold > 0 ? Math.ceil(goal / sold) : null;
+        const featOnly = booked > 0 ? Math.ceil(goal / booked) : null;
+        $('p-prem-only-label').textContent = 'Premium alone' + (sold > 0 ? ' (' + plural(sold, 'upgrade') + ')' : '') + ' would need';
+        $('p-feat-only-label').textContent = 'Featured alone' + (booked > 0 ? ' (' + plural(booked, 'slot') + ')' : '') + ' would need';
+        $('p-prem-only').textContent = premOnly === null ? 'add upgrades sold' : usd.format(premOnly) + ' each';
+        $('p-feat-only').textContent = featOnly === null ? 'add slots booked' : usd.format(featOnly) + ' per slot';
+        const pIn = filled(el.prem), fIn = filled(el.feat), big = $('p-big'), head = $('p-head'), sub = $('p-sub');
+        big.classList.remove('neg');
+        const summary = (p, f) => '<span class="pill good">Your pricing plan</span><br>Charge ' + usd.format(p) + ' for Premium and ' + usd.format(f) +
+          ' per featured slot, sell ' + plural(sold, 'upgrade') + ' and book ' + plural(booked, 'slot') + ', and your fair nets about ' +
+          (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet)) + '.';
+        const flip = (f, p) => f < p
+          ? '<br><br>At these numbers Featured would cost less than Premium. Consider raising your Featured rate so the scarce slots stay premium.' : '';
+
+        if (pIn && fIn) {
+          const rev = sold * prem + booked * feat;
+          head.textContent = 'Your rates bring in';
+          big.textContent = usd.format(rev);
+          sub.textContent = goal > 0 ? Math.round(rev / goal * 100) + '% of your target revenue' : '';
+          note.innerHTML = '<span class="pill warn">Both rates entered</span><br>Clear one rate and the calculator will work out what it needs to be to hit your goal.';
+        } else if (pIn || fIn) {
+          const solvingFeat = pIn;
+          const known = solvingFeat ? prem : feat, knownCount = solvingFeat ? sold : booked, otherCount = solvingFeat ? booked : sold;
+          const unit = solvingFeat ? ' per slot' : ' each';
+          head.textContent = solvingFeat ? 'Featured rate needed' : 'Premium rate needed';
+          const needed = goal - known * knownCount;
+          if (otherCount === 0) {
+            big.textContent = '—';
+            sub.textContent = '';
+            note.innerHTML = '<span class="pill warn">Add expected sales</span><br>Enter how many ' + (solvingFeat ? 'featured slots you expect to book' : 'Premium upgrades you expect to sell') + ' to solve for that rate.';
+          } else if (needed <= 0) {
+            big.textContent = usd.format(0);
+            sub.textContent = (solvingFeat ? 'Premium' : 'Featured') + ' alone reaches your goal at ' + usd.format(known) + (solvingFeat ? ' each' : ' per slot');
+            note.innerHTML = '<span class="pill good">Goal covered</span><br>Your ' + (solvingFeat ? 'Premium' : 'Featured') + ' sales already reach your target, so you can set the other rate wherever you like. Every sale is extra profit.';
+          } else {
+            const solved = Math.ceil(needed / otherCount);
+            big.textContent = usd.format(solved) + unit;
+            sub.textContent = 'With ' + (solvingFeat ? 'Premium at ' + usd.format(prem) + ' × ' + num.format(sold) : 'Featured at ' + usd.format(feat) + ' × ' + num.format(booked)) +
+              ' and ' + (solvingFeat ? plural(booked, 'slot') + ' booked' : plural(sold, 'upgrade') + ' sold');
+            const p = solvingFeat ? prem : solved, f = solvingFeat ? solved : feat;
+            note.innerHTML = summary(p, f) + flip(f, p);
+          }
+        } else {
+          head.textContent = 'Rates to hit your goal';
+          big.textContent = 'Enter one rate';
+          sub.textContent = 'Fill in the rate you’re most sure of and the other will be solved. The single-upgrade rates below show the most you’d need to charge for either one.';
+          note.innerHTML = '';
+        }
+      }
+    }
+
+    document.querySelectorAll('.calc-tab').forEach(tab => tab.addEventListener('click', () => {
+      mode = tab.dataset.mode;
+      document.querySelectorAll('.calc-tab').forEach(t => t.setAttribute('aria-selected', t === tab));
+      $('c-sold-wrap').hidden = mode === 'quota';
+      $('c-goal-wrap').hidden = mode !== 'pricing';
+      $('c-rates-tip').hidden = mode !== 'pricing';
+      calc();
+    }));
+    Object.values(el).forEach(input => {
+      input.addEventListener('input', calc);
+      // Tidy the number when the visitor leaves the field: 356000 → 356,000
+      input.addEventListener('blur', () => {
+        const n = raw(input);
+        if (input.value.trim() === '') return;
+        input.value = isFinite(n) ? num.format(n) : '';
+        calc();
+      });
+    });
+    target.addEventListener('input', () => { targetDirty = target.value.trim() !== ''; calc(); });
+    target.addEventListener('blur', () => { if (targetDirty && isFinite(raw(target))) target.value = num.format(raw(target)); calc(); });
+    range.addEventListener('input', () => { targetDirty = true; target.value = num.format(Number(range.value)); calc(); });
+    $('c-target-reset').addEventListener('click', () => { targetDirty = false; calc(); });
+    calc();
   })();
 
   /* ── Scroll reveal ── */
