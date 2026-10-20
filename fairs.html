@@ -32,7 +32,25 @@
   .nav-links a{ text-decoration:none; color:var(--navy); }
   .nav-links a:not(.btn):hover{ color:var(--sky); }
   .nav-links a.btn-primary{ color:#fff; }
-  @media (max-width:760px){ .nav-links a:not(.btn){ display:none; } }
+  .menu-btn{ display:none; width:44px; height:44px; border:0; background:transparent; border-radius:12px; cursor:pointer; color:var(--navy); align-items:center; justify-content:center; }
+  @media (hover:hover){ .menu-btn:hover{ background:var(--tint); } }
+  .menu-btn svg{ width:26px; height:26px; }
+  .menu-btn .i-close{ display:none; }
+  .nav.open .menu-btn .i-open{ display:none; }
+  .nav.open .menu-btn .i-close{ display:block; }
+  .mobile-menu{ display:none; }
+  section[id], header[id]{ scroll-margin-top:84px; }
+  @media (max-width:760px){
+    .nav-links a:not(.btn){ display:none; }
+    .nav-links{ gap:6px; }
+    .menu-btn{ display:inline-flex; }
+    .mobile-menu{ display:block; position:absolute; left:0; right:0; top:100%; background:#fff; border-bottom:1px solid var(--line);
+                  box-shadow:0 14px 30px rgba(8,25,45,.12); padding:6px 16px 14px; visibility:hidden; opacity:0; transform:translateY(-6px);
+                  transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s; }
+    .nav.open .mobile-menu{ visibility:visible; opacity:1; transform:none; transition:opacity .18s ease, transform .18s ease; }
+    .mobile-menu a{ display:block; padding:14px 4px; font-size:17px; font-weight:600; color:var(--navy); text-decoration:none; border-bottom:1px solid var(--line); }
+    .mobile-menu a:last-child{ border-bottom:0; }
+  }
 
   .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:700; font-size:15px; text-decoration:none; border-radius:999px; padding:13px 26px; transition:transform .15s, box-shadow .15s, background .15s; border:0; cursor:pointer; font-family:inherit; }
   .btn-primary{ background:var(--orange); color:#fff; box-shadow:0 6px 18px rgba(232,137,12,.35); }
@@ -219,7 +237,16 @@
       <a href="#revenue">Revenue</a>
       <a href="#plans">Plans</a>
       <a class="btn btn-primary btn-sm" href="#demo">Book a Demo</a>
+      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
     </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#experience">Experience</a>
+    <a href="#revenue">Revenue</a>
+    <a href="#plans">Plans</a>
   </div>
 </nav>
 
@@ -253,10 +280,10 @@
     </div>
     <div class="stat reveal">
       <div class="big">Paper maps don't search.</div>
-      <p>A guest craving fried dough or looking for a booth they saw last year can't type that into a printed map.</p>
+      <p>A guest craving fried dough or looking for a vendor they loved last year can't type that into a printed map.</p>
     </div>
     <div class="stat reveal">
-      <div class="big">Missed booths mean missed sales.</div>
+      <div class="big">Missed vendors mean missed sales.</div>
       <p>Every vendor who goes unfound has a slower fair, and slower fairs make it harder to bring great vendors back.</p>
     </div>
   </div>
@@ -283,7 +310,7 @@
       <div class="feature reveal">
         <div class="phone"><img src="img/map.jpg" alt="Satellite map showing a vendor's exact location"></div>
         <h3>"Show Me The Way"</h3>
-        <p>A satellite map pins each vendor's exact spot on your grounds and shows guests where they are, so they can walk right to the booth.</p>
+        <p>A satellite map pins each vendor's exact spot on your grounds and shows guests where they are, so they can walk right to it.</p>
       </div>
     </div>
   </div>
@@ -408,7 +435,7 @@
     </div>
     <div class="steps">
       <div class="step reveal"><h3>Book a demo</h3><p>See the app and the admin portal in 15 minutes, and pick the plan that fits your fair.</p></div>
-      <div class="step reveal"><h3>We set up your event</h3><p>We create your fair in Fair Friend, then invite your vendors to sign up for free and pin their booth on the map.</p></div>
+      <div class="step reveal"><h3>We set up your event</h3><p>We create your fair in Fair Friend, then invite your vendors to sign up for free and pin their location on the map.</p></div>
       <div class="step reveal"><h3>Open the gates</h3><p>Promote the app with signage and social posts, and watch fairgoers find your vendors faster.</p></div>
     </div>
   </div>
@@ -497,6 +524,22 @@
     msg.className = 'form-msg ok'; msg.textContent = 'Your email app should open with your request ready to send.';
   });
 
+
+  /* ── Mobile menu ── */
+  (function(){
+    const nav = document.querySelector('.nav');
+    const btn = nav.querySelector('.menu-btn');
+    function setOpen(open){
+      nav.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
+    btn.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+    nav.querySelectorAll('.mobile-menu a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+    document.addEventListener('click', e => { if (!nav.contains(e.target)) setOpen(false); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 760) setOpen(false); });
+  })();
 
   /* ── Featured zoom: as the section scrolls into view, the phone zooms into the Featured spot ── */
   (function(){
