@@ -62,7 +62,7 @@
                          0 0 0 2000px rgba(6,18,36,calc(.62 * var(--p))); }
   .feat-tag{ opacity:var(--p); }
   .prem-ring{ position:absolute; left:1%; width:98%; top:26%; height:63.6%; border-radius:5% / 3.4%; pointer-events:none; --p:0;
-              box-shadow:0 0 0 3px #FFC56B, 0 0 22px 4px rgba(255,197,107,.6); opacity:0; transition:opacity .8s ease .5s; }
+              box-shadow:0 0 0 3px #FFC56B, 0 0 22px 4px rgba(255,197,107,.6), 0 0 0 2000px rgba(6,18,36,.62); opacity:0; transition:opacity .8s ease .5s; }
   .reveal.in .prem-ring{ opacity:1; --p:1; }
   .prem-ring .feat-tag{ opacity:1; transform:translate(-50%,50%); transition:transform .8s ease .5s; }
 
@@ -125,6 +125,7 @@
   .tier.premium{ background:rgba(232,137,12,.14); border-color:rgba(255,197,107,.5); }
   .tier .t{ font-size:12px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:rgba(255,255,255,.7); }
   .tier.premium .t{ color:#FFC56B; }
+  .tier.premium b{ color:#FFC56B; font-weight:600; }
   .tier ul{ list-style:none; margin-top:8px; font-size:14px; color:rgba(255,255,255,.9); display:grid; gap:4px; }
   .slots{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:24px; }
   .slot{ text-align:center; border-radius:14px; padding:14px 8px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); }
@@ -324,15 +325,15 @@
       </div></div></div>
       <div class="rev-copy">
         <h3>Premium Listings: <span>a richer storefront for vendors who want more.</span></h3>
-        <p>Every vendor can list for free. Vendors who want to show off their full menu, more photos and a longer story upgrade to Premium for your event.</p>
+        <p>Every vendor can list for free. Vendors who want to appear first when fairgoers search, and show off their full menu, more photos and a longer story, upgrade to Premium for your event.</p>
         <div class="tier-cards">
           <div class="tier">
             <div class="t">Basic · Free</div>
-            <ul><li>3 featured items</li><li>Short description</li><li>Map pin &amp; directions</li></ul>
+            <ul><li>Standard search placement</li><li>3 featured items</li><li>Short description</li><li>Map pin &amp; directions</li></ul>
           </div>
           <div class="tier premium">
             <div class="t">★ Premium · Paid</div>
-            <ul><li>Unlimited items with descriptions</li><li>Up to 10 photos</li><li>Full 1,000-character story</li></ul>
+            <ul><li><b>Shown first in search results</b></li><li>Unlimited items with descriptions</li><li>Up to 10 photos</li><li>Full 1,000-character story</li></ul>
           </div>
         </div>
         <ul class="checks">
