@@ -28,6 +28,12 @@
   .nav .wrap{ display:flex; align-items:center; justify-content:space-between; height:76px; }
   .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:800; color:var(--navy); font-size:18px; }
   .brand img{ height:62px; width:auto; }
+  section[id], header[id]{ scroll-margin-top:84px; }
+  @media (min-width:761px){
+    .nav .wrap{ height:96px; }
+    .brand img{ height:82px; }
+    section[id], header[id]{ scroll-margin-top:104px; }
+  }
   .nav-links{ display:flex; align-items:center; gap:28px; font-size:14px; font-weight:600; }
   .nav-links a{ text-decoration:none; color:var(--navy); }
   .nav-links a:not(.btn):hover{ color:var(--sky); }
@@ -39,7 +45,6 @@
   .nav.open .menu-btn .i-open{ display:none; }
   .nav.open .menu-btn .i-close{ display:block; }
   .mobile-menu{ display:none; }
-  section[id], header[id]{ scroll-margin-top:84px; }
   @media (max-width:760px){
     .nav-links a:not(.btn){ display:none; }
     .nav-links{ gap:6px; }
