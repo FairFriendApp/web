@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Break-Even Calculator – Fair Friend for Fairs</title>
+<meta name="description" content="Run the numbers for your fair. Project your Self-Managed revenue, set a sales quota, or find the Premium and Featured rates that hit your revenue goal.">
+<meta property="og:title" content="Fair Friend Break-Even Calculator">
+<meta property="og:description" content="See what the Self-Managed plan could earn your fair.">
+<meta property="og:image" content="https://www.fairfriend.app/img/ff-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --navy:#0C2340; --orange:#E8890C; --sky:#1D7FBF; --sky-bright:#2B9BE6;
+    --green:#2F7E5C; --pink:#F497C6; --ink:#33414F; --muted:#5F6E7D;
+    --line:#DCE5EE; --tint:#F3F8FC; --cream:#FFF8EE;
+  }
+  html{ scroll-behavior:smooth; }
+  body{ font-family:'Poppins',sans-serif; color:var(--ink); background:#fff; line-height:1.6; overflow-x:hidden; }
+  img{ max-width:100%; display:block; }
+  a{ color:inherit; }
+  .wrap{ width:min(1120px, 100% - 32px); margin-inline:auto; }
+
+  /* ── Nav ── */
+  .nav{ position:sticky; top:0; z-index:20; background:rgba(255,255,255,.92); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .nav .wrap{ display:flex; align-items:center; justify-content:space-between; height:76px; }
+  .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:800; color:var(--navy); font-size:18px; }
+  .brand img{ height:62px; width:auto; }
+  section[id], header[id]{ scroll-margin-top:84px; }
+  @media (min-width:761px){
+    .nav .wrap{ height:96px; }
+    .brand img{ height:82px; }
+    section[id], header[id]{ scroll-margin-top:104px; }
+  }
+  .nav-links{ display:flex; align-items:center; gap:28px; font-size:14px; font-weight:600; }
+  .nav-links a{ text-decoration:none; color:var(--navy); }
+  .nav-links a:not(.btn):hover{ color:var(--sky); }
+  .nav-links a.btn-primary{ color:#fff; }
+  .menu-btn{ display:none; width:44px; height:44px; border:0; background:transparent; border-radius:12px; cursor:pointer; color:var(--navy); align-items:center; justify-content:center; }
+  @media (hover:hover){ .menu-btn:hover{ background:var(--tint); } }
+  .menu-btn svg{ width:26px; height:26px; }
+  .menu-btn .i-close{ display:none; }
+  .nav.open .menu-btn .i-open{ display:none; }
+  .nav.open .menu-btn .i-close{ display:block; }
+  .mobile-menu{ display:none; }
+  @media (max-width:760px){
+    .nav-links a:not(.btn){ display:none; }
+    .nav-links{ gap:6px; }
+    .menu-btn{ display:inline-flex; }
+    .mobile-menu{ display:block; position:absolute; left:0; right:0; top:100%; background:#fff; border-bottom:1px solid var(--line);
+                  box-shadow:0 14px 30px rgba(8,25,45,.12); padding:6px 16px 14px; visibility:hidden; opacity:0; transform:translateY(-6px);
+                  transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s; }
+    .nav.open .mobile-menu{ visibility:visible; opacity:1; transform:none; transition:opacity .18s ease, transform .18s ease; }
+    .mobile-menu a{ display:block; padding:14px 4px; font-size:17px; font-weight:600; color:var(--navy); text-decoration:none; border-bottom:1px solid var(--line); }
+    .mobile-menu a:last-child{ border-bottom:0; }
+  }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:700; font-size:15px; text-decoration:none; border-radius:999px; padding:13px 26px; transition:transform .15s, box-shadow .15s, background .15s; border:0; cursor:pointer; font-family:inherit; }
+  .btn-primary{ background:var(--orange); color:#fff; box-shadow:0 6px 18px rgba(232,137,12,.35); }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(232,137,12,.42); }
+  .btn-ghost{ background:rgba(255,255,255,.16); color:#fff; border:1.5px solid rgba(255,255,255,.55); }
+  .btn-ghost:hover{ background:rgba(255,255,255,.26); }
+  .btn-sm{ padding:9px 18px; font-size:14px; }
+
+  /* ── Hero ── */
+  .hero{ background:linear-gradient(180deg,#1E7FD6 0%, var(--sky-bright) 40%, #2F8F6E 100%); color:#fff; position:relative; z-index:2; overflow-x:clip; }
+  .hero .wrap{ display:grid; grid-template-columns:1.15fr .85fr; gap:40px; align-items:center; padding:72px 0 0; }
+  .eyebrow{ display:inline-block; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.4); padding:6px 14px; border-radius:999px; margin-bottom:22px; }
+  .hero h1{ font-size:clamp(34px,5.2vw,58px); line-height:1.05; font-weight:800; letter-spacing:-1px; }
+  .hero h1 span{ display:block; color:#FFD27A; }
+  .hero .lede{ margin-top:20px; font-size:clamp(16px,2vw,19px); max-width:540px; color:rgba(255,255,255,.94); }
+  .hero .lede em{ font-weight:700; }
+  .hero-ctas{ display:flex; flex-wrap:wrap; gap:14px; margin-top:32px; }
+  .hero-note{ margin-top:22px; font-size:13px; color:rgba(255,255,255,.8); font-weight:500; }
+  .hero-phone{ justify-self:center; align-self:end; width:min(340px,80vw); margin-bottom:-110px; }
+  .zoom-stage{ width:100%; max-width:440px; overflow:hidden; display:flex; justify-content:center; padding:6px 0 0;
+               -webkit-mask-image:linear-gradient(#000 80%, transparent 100%); mask-image:linear-gradient(#000 80%, transparent 100%); }
+  .zoom-stage .phone{ width:min(290px,72vw) !important; --p:0; --zmax:.45; transform:scale(calc(1 + var(--zmax) * var(--p))); transform-origin:50% 18%; will-change:transform; }
+  .screen{ position:relative; overflow:hidden; border-radius:35px; }
+  /* The huge outer shadow dims everything outside the card; .screen clips it to the phone screen */
+  .feat-ring{ position:absolute; left:3.6%; width:92.8%; top:14.75%; height:37.55%; border-radius:5.5% / 10%; pointer-events:none;
+              box-shadow:0 0 0 3px rgba(255,197,107,var(--p)), 0 0 26px 6px rgba(255,197,107,calc(.75 * var(--p))),
+                         0 0 0 2000px rgba(6,18,36,calc(.62 * var(--p))); }
+  .feat-tag{ opacity:var(--p); }
+  .prem-ring{ position:absolute; left:1%; width:98%; top:26%; height:63.6%; border-radius:5% / 3.4%; pointer-events:none; --p:0;
+              box-shadow:0 0 0 3px #FFC56B, 0 0 22px 4px rgba(255,197,107,.6), 0 0 0 2000px rgba(6,18,36,.62); opacity:0; transition:opacity .8s ease .5s; }
+  .reveal.in .prem-ring{ opacity:1; --p:1; }
+  .prem-ring .feat-tag{ opacity:1; transform:translate(-50%,50%); transition:transform .8s ease .5s; }
+
+  .feat-tag{ position:absolute; left:50%; bottom:0; transform:translate(-50%,55%) scale(calc(.6 + .4 * var(--p))); white-space:nowrap;
+             background:var(--orange); color:#fff; font-size:11px; font-weight:700; letter-spacing:.4px; padding:5px 12px; border-radius:999px;
+             box-shadow:0 6px 16px rgba(0,0,0,.25); }
+  @media (max-width:860px){
+    .hero .wrap{ grid-template-columns:1fr; text-align:center; padding-top:56px; }
+    .hero .lede{ margin-inline:auto; }
+    .hero-ctas{ justify-content:center; }
+    .hero-phone{ margin-top:12px; margin-bottom:-160px; width:min(300px,78vw); }
+  }
+
+  /* ── Phone frame ── */
+  .phone{ background:#0E0F12; border-radius:44px; padding:10px; box-shadow:0 30px 60px rgba(8,25,45,.35), inset 0 0 0 1.5px #3A3D44; }
+  .phone img{ border-radius:35px; width:100%; }
+
+  /* ── Sections ── */
+  section{ padding:96px 0; }
+  .section-head{ text-align:center; max-width:720px; margin:0 auto 56px; }
+  .kicker{ font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--orange); }
+  h2{ font-size:clamp(28px,3.6vw,42px); line-height:1.15; color:var(--navy); font-weight:800; letter-spacing:-.5px; margin-top:8px; }
+  .section-head p{ margin-top:16px; font-size:17px; color:var(--muted); text-wrap:balance; }
+
+  /* Problem strip */
+  .problem{ padding:160px 0 90px; background:var(--cream); }
+  .problem .wrap{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  .stat{ background:#fff; border-radius:20px; padding:28px; border:1px solid #F1E3CC; }
+  .stat .big{ font-size:22px; font-weight:800; color:var(--navy); line-height:1.25; }
+  .stat p{ margin-top:10px; color:var(--muted); font-size:15px; }
+  .problem-head{ grid-column:1/-1; text-align:center; max-width:760px; margin:0 auto 20px; }
+  @media (max-width:860px){ .problem{ padding-top:210px; } .problem .wrap{ grid-template-columns:1fr; } }
+
+  /* Feature trio */
+  .trio{ display:grid; grid-template-columns:repeat(3,1fr); gap:36px; }
+  .feature{ text-align:center; }
+  .feature .phone{ width:min(270px,78vw); margin:0 auto 28px; }
+  .feature h3{ font-size:21px; color:var(--navy); font-weight:700; }
+  .feature p{ margin-top:8px; color:var(--muted); font-size:15px; max-width:320px; margin-inline:auto; }
+  @media (max-width:900px){ .trio{ grid-template-columns:1fr; gap:64px; } }
+
+  /* Revenue */
+  .revenue{ background:linear-gradient(180deg,var(--navy) 0%, #12345C 100%); color:#fff; }
+  .revenue h2{ color:#fff; }
+  .revenue .section-head p{ color:rgba(255,255,255,.78); }
+  .rev-row{ display:grid; grid-template-columns:.8fr 1.2fr; gap:56px; align-items:center; }
+  .rev-row + .rev-row{ margin-top:96px; }
+  .rev-row.flip{ grid-template-columns:1.2fr .8fr; }
+  .rev-row.flip .rev-media{ order:2; }
+  .rev-media{ display:flex; justify-content:center; }
+  .rev-media .phone{ width:min(290px,78vw); }
+  .rev-copy h3{ font-size:clamp(24px,2.8vw,32px); font-weight:800; line-height:1.2; }
+  .rev-copy h3 span{ color:#FFC56B; }
+  .rev-copy > p{ margin-top:14px; color:rgba(255,255,255,.82); font-size:16px; }
+  .checks{ list-style:none; margin-top:22px; display:grid; gap:12px; }
+  .checks li{ display:flex; gap:12px; align-items:flex-start; font-size:15px; color:rgba(255,255,255,.92); }
+  .checks li::before{ content:""; flex:none; width:22px; height:22px; margin-top:1px; border-radius:50%; background:var(--orange) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/14px no-repeat; }
+  .tier-cards{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:26px; }
+  .tier{ border-radius:16px; padding:18px 20px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); }
+  .tier.premium{ background:rgba(232,137,12,.14); border-color:rgba(255,197,107,.5); }
+  .tier .t{ font-size:12px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:rgba(255,255,255,.7); }
+  .tier.premium .t{ color:#FFC56B; }
+  .tier.premium b{ color:#FFC56B; font-weight:600; }
+  .tier ul{ list-style:none; margin-top:8px; font-size:14px; color:rgba(255,255,255,.9); display:grid; gap:4px; }
+  .slots{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:24px; }
+  .slot{ text-align:center; border-radius:14px; padding:14px 8px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); }
+  .slot b{ display:block; font-size:15px; }
+  .slot small{ font-size:12px; color:rgba(255,255,255,.7); }
+  @media (max-width:900px){
+    .rev-row, .rev-row.flip{ grid-template-columns:1fr; gap:40px; }
+    .rev-row.flip .rev-media{ order:0; }
+  }
+  @media (max-width:480px){ .tier-cards{ grid-template-columns:1fr; } }
+
+  /* Control */
+  .control{ background:var(--tint); }
+  .control-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:20px; padding:26px 24px; }
+  .card .ico{ width:46px; height:46px; border-radius:14px; display:grid; place-items:center; font-size:22px; background:#E6F2FB; margin-bottom:16px; }
+  .card h3{ font-size:17px; color:var(--navy); font-weight:700; line-height:1.3; }
+  .card p{ margin-top:8px; font-size:14.5px; color:var(--muted); }
+  @media (max-width:980px){ .control-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:560px){ .control-grid{ grid-template-columns:1fr; } }
+
+  /* Plans */
+  .plans{ display:grid; grid-template-columns:1fr 1fr; gap:28px; max-width:960px; margin:0 auto; }
+  .plan{ border:1.5px solid var(--line); border-radius:24px; padding:36px 32px; position:relative; background:#fff; display:flex; flex-direction:column; }
+  .plan.featured{ border-color:var(--orange); box-shadow:0 18px 44px rgba(232,137,12,.16); }
+  .ribbon{ position:absolute; top:-14px; left:32px; background:var(--orange); color:#fff; font-size:12px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; padding:5px 14px; border-radius:999px; }
+  .plan h3{ font-size:24px; color:var(--navy); font-weight:800; }
+  .plan .tag{ margin-top:4px; color:var(--muted); font-size:15px; }
+  .price{ margin:22px 0 4px; font-size:34px; font-weight:800; color:var(--navy); line-height:1.1; }
+  .price small{ font-size:15px; font-weight:600; color:var(--muted); }
+  .price-note{ font-size:13.5px; color:var(--muted); }
+  .plan ul{ list-style:none; margin:24px 0 30px; display:grid; gap:12px; }
+  .plan li{ display:flex; gap:12px; font-size:15px; }
+  .plan li::before{ content:""; flex:none; width:22px; height:22px; margin-top:1px; border-radius:50%; background:var(--sky) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/14px no-repeat; }
+  .plan .btn{ margin-top:auto; }
+  .plan .btn-outline{ background:#fff; color:var(--navy); border:1.5px solid var(--navy); }
+  .plan .btn-outline:hover{ background:var(--navy); color:#fff; }
+  @media (max-width:820px){ .plans{ grid-template-columns:1fr; } }
+
+  /* Steps */
+  .steps-sec{ background:var(--cream); }
+  .steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:28px; counter-reset:s; }
+  .step{ background:#fff; border-radius:20px; padding:30px 26px; border:1px solid #F1E3CC; counter-increment:s; }
+  .step::before{ content:counter(s); display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:var(--navy); color:#fff; font-weight:800; font-size:18px; margin-bottom:16px; }
+  .step h3{ font-size:18px; color:var(--navy); font-weight:700; }
+  .step p{ margin-top:8px; font-size:15px; color:var(--muted); }
+  @media (max-width:860px){ .steps{ grid-template-columns:1fr; } }
+
+  /* Demo form */
+  .demo{ background:linear-gradient(180deg,#1E7FD6 0%, var(--sky-bright) 45%, #2F8F6E 100%); }
+  .demo .wrap{ display:grid; grid-template-columns:.9fr 1.1fr; gap:56px; align-items:center; }
+  .demo-copy{ color:#fff; }
+  .demo-copy h2{ color:#fff; }
+  .demo-copy p{ margin-top:16px; font-size:17px; color:rgba(255,255,255,.92); }
+  .demo-copy .contact{ margin-top:28px; font-weight:700; font-size:17px; }
+  .demo-copy .contact a{ color:#FFD27A; text-decoration:none; }
+  form{ background:#fff; border-radius:24px; padding:34px 32px; box-shadow:0 30px 60px rgba(8,25,45,.25); display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  form h3{ grid-column:1/-1; color:var(--navy); font-size:22px; font-weight:800; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field.full{ grid-column:1/-1; }
+  label{ font-size:13px; font-weight:600; color:var(--navy); }
+  label .opt{ color:var(--muted); font-weight:500; }
+  input, select, textarea{ font-family:inherit; font-size:15px; color:var(--ink); padding:12px 14px; border:1.5px solid var(--line); border-radius:12px; background:#fff; width:100%; }
+  input:focus, select:focus, textarea:focus{ outline:none; border-color:var(--sky); box-shadow:0 0 0 3px rgba(29,127,191,.15); }
+  textarea{ resize:vertical; min-height:96px; }
+  form .btn{ grid-column:1/-1; width:100%; padding:15px; font-size:16px; }
+  .form-msg{ grid-column:1/-1; font-size:14px; text-align:center; color:var(--muted); min-height:1em; }
+  .form-msg.ok{ color:var(--green); font-weight:600; }
+  .form-msg.err{ color:#C0392B; font-weight:600; }
+  .hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  @media (max-width:900px){ .demo .wrap{ grid-template-columns:1fr; } }
+  @media (max-width:520px){ form{ grid-template-columns:1fr; padding:26px 20px; } }
+
+  /* Break-even calculator */
+  .plan .calc-link{ display:inline-block; margin-top:10px; font-size:14px; font-weight:700; color:var(--sky); text-decoration:none; }
+  .plan .calc-link:hover{ text-decoration:underline; }
+  .calc-sec{ background:var(--tint); }
+  .calc{ max-width:1000px; margin:0 auto; background:#fff; border:1px solid var(--line); border-radius:24px; box-shadow:0 18px 44px rgba(8,25,45,.08);
+         display:grid; grid-template-columns:1.05fr .95fr; overflow:hidden; }
+  .calc-inputs{ padding:32px; }
+  .calc-tabs{ display:inline-flex; background:var(--tint); border:1px solid var(--line); border-radius:999px; padding:4px; margin-bottom:12px; }
+  .calc-top{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; margin-bottom:12px; }
+  .calc-top .calc-tabs{ margin-bottom:0; }
+  .calc-clear{ font-family:inherit; font-size:13px; font-weight:700; color:var(--muted); background:none; border:0; padding:6px 2px; cursor:pointer; text-decoration:underline; }
+  .calc-clear:hover{ color:var(--navy); }
+  .calc-desc{ font-size:14px; color:var(--muted); margin-bottom:24px; min-height:2.6em; }
+  .calc-tab{ font-family:inherit; font-size:14px; font-weight:700; color:var(--navy); background:transparent; border:0; border-radius:999px; padding:9px 18px; cursor:pointer; }
+  .calc-tab[aria-selected="true"]{ background:var(--navy); color:#fff; }
+  .calc-group + .calc-group{ margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
+  .calc-group h4{ font-size:12px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--orange); margin-bottom:12px; }
+  .calc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .calc-field{ display:flex; flex-direction:column; gap:6px; }
+  .calc-field small{ font-size:12px; color:var(--muted); line-height:1.4; }
+  .money{ position:relative; }
+  .money::before{ content:"$"; position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:600; font-size:15px; pointer-events:none; }
+  .money input{ padding-left:28px; }
+  .calc-results{ background:linear-gradient(180deg,var(--navy) 0%, #12345C 100%); color:#fff; padding:32px; display:flex; flex-direction:column; }
+  .calc-results h4{ font-size:12px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#FFC56B; }
+  .calc-big{ font-size:clamp(34px,4.4vw,46px); font-weight:800; line-height:1.1; margin-top:8px; }
+  .calc-big.neg{ color:#FF9B8A; }
+  .calc-sub{ margin-top:6px; font-size:14px; color:rgba(255,255,255,.78); }
+  .calc-rows{ margin-top:22px; display:grid; gap:10px; font-size:14.5px; }
+  .calc-row{ display:flex; justify-content:space-between; gap:12px; color:rgba(255,255,255,.88); }
+  .calc-row b{ color:#fff; font-weight:700; white-space:nowrap; }
+  .calc-row.total{ padding-top:10px; border-top:1px solid rgba(255,255,255,.18); }
+  .calc-bars{ margin-top:24px; display:grid; gap:12px; }
+  .bar-label{ display:flex; justify-content:space-between; font-size:12.5px; color:rgba(255,255,255,.75); margin-bottom:5px; }
+  .bar{ height:12px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden; }
+  .bar span{ display:block; height:100%; border-radius:999px; transition:width .35s ease; }
+  .bar .rev{ background:linear-gradient(90deg,var(--orange),#FFC56B); }
+  .bar .lic{ background:rgba(255,255,255,.55); }
+  .calc-note{ margin-top:auto; padding-top:22px; font-size:14px; color:rgba(255,255,255,.92); }
+  .calc-note .pill{ display:inline-block; font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; margin-bottom:8px; }
+  .pill.good{ background:rgba(47,126,92,.35); color:#9BE3BF; }
+  .pill.warn{ background:rgba(232,137,12,.25); color:#FFC56B; }
+  .calc-foot{ max-width:1000px; margin:18px auto 0; text-align:center; font-size:13px; color:var(--muted); }
+  .calc-empty-big{ font-size:clamp(22px,2.6vw,28px); font-weight:800; line-height:1.25; margin-top:10px; }
+  .calc-range{ width:100%; margin:12px 0 6px; accent-color:var(--orange); padding:0; border:0; height:24px; }
+  .calc-range:focus{ box-shadow:none; }
+  .calc-link-btn{ font-family:inherit; font-size:12px; font-weight:700; color:var(--sky); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; }
+  .calc-tip{ margin-top:12px; font-size:13px; color:var(--muted); background:var(--cream); border:1px solid #F1E3CC; border-radius:12px; padding:10px 12px; }
+  .calc-inputs input:disabled{ background:var(--tint); color:var(--muted); border-style:dashed; cursor:not-allowed; -webkit-text-fill-color:var(--muted); opacity:1; }
+  .calc-inputs input:disabled::placeholder{ color:var(--navy); font-weight:600; opacity:.75; }
+  .calc-solved{ display:inline-block; margin-left:4px; font-size:10.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--sky); background:#E6F2FB; border-radius:999px; padding:1px 8px; vertical-align:1px; }
+  .times{ position:relative; max-width:160px; }
+  .times::after{ content:"\00D7"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:700; font-size:16px; pointer-events:none; }
+  .times input{ padding-right:32px; }
+  .p-opts{ display:grid; gap:10px; margin:18px 0 22px; }
+  .p-opt{ display:flex; justify-content:space-between; align-items:center; gap:12px; border-radius:14px; padding:12px 14px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); }
+  .p-opt > b{ font-size:20px; font-weight:800; white-space:nowrap; }
+  .p-opt small{ display:block; font-size:12px; color:rgba(255,255,255,.7); }
+  .p-opt-label{ font-size:12px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:rgba(255,255,255,.85); }
+  .p-opt.both{ display:block; background:rgba(232,137,12,.14); border-color:rgba(255,197,107,.55); padding:14px 16px; }
+  .p-opt.both .p-opt-label{ color:#FFC56B; }
+  .p-pair{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; }
+  .p-pair b{ display:block; font-size:clamp(26px,3.2vw,32px); font-weight:800; line-height:1.15; }
+  /* Inside two-column rows, the Calculated tag sits inside the locked box so labels stay on one line */
+  .calc-grid .calc-field{ position:relative; }
+  .calc-grid .calc-solved{ position:absolute; right:12px; top:41px; margin:0; vertical-align:baseline; pointer-events:none; }
+  [hidden]{ display:none !important; }
+  @media (max-width:860px){ .calc{ grid-template-columns:1fr; } }
+  @media (max-width:480px){ .calc-inputs, .calc-results{ padding:24px 20px; } .calc-grid{ grid-template-columns:1fr; } }
+
+  footer{ background:var(--navy); color:rgba(255,255,255,.75); padding:40px 0; font-size:14px; }
+  footer .wrap{ display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center; }
+  footer a{ color:#fff; text-decoration:none; margin-left:20px; }
+  footer a:first-child{ margin-left:0; }
+
+  .reveal{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; transition:none; } html{ scroll-behavior:auto; } }
+
+  /* ── Calculator page ── */
+  .nav-links a[aria-current="page"], .mobile-menu a[aria-current="page"]{ color:var(--sky); }
+  .calc-page{ padding:64px 0 96px; }
+  .back-link{ display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:600; color:var(--sky); text-decoration:none; margin-bottom:18px; }
+  .back-link:hover{ text-decoration:underline; }
+  .calc-page h1{ font-size:clamp(30px,4.2vw,46px); line-height:1.12; color:var(--navy); font-weight:800; letter-spacing:-.5px; margin-top:8px; }
+  .calc-cta{ background:linear-gradient(180deg,#1E7FD6 0%, var(--sky-bright) 45%, #2F8F6E 100%); color:#fff; text-align:center; padding:80px 0; }
+  .calc-cta h2{ color:#fff; }
+  .calc-cta p{ margin:14px auto 0; max-width:620px; font-size:17px; color:rgba(255,255,255,.92); }
+  .calc-cta .hero-ctas{ justify-content:center; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="https://www.fairfriend.app/" aria-label="Fair Friend home"><img src="img/ff-logo.png" alt="Fair Friend"></a>
+    <div class="nav-links">
+      <a href="fairs.html#experience">Experience</a>
+      <a href="fairs.html#revenue">Revenue</a>
+      <a href="fairs.html#plans">Plans</a>
+      <a href="calculator.html" aria-current="page">Calculator</a>
+      <a class="btn btn-primary btn-sm" href="fairs.html?plan=Self-Managed#demo">Let&rsquo;s Talk</a>
+      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="fairs.html#experience">Experience</a>
+    <a href="fairs.html#revenue">Revenue</a>
+    <a href="fairs.html#plans">Plans</a>
+    <a href="calculator.html" aria-current="page">Calculator</a>
+  </div>
+</nav>
+
+<main class="calc-sec calc-page" id="calculator">
+  <div class="wrap">
+    <div class="section-head">
+      <a class="back-link" href="fairs.html#plans">&larr; Back to partnership plans</a><br>
+      <span class="kicker">Self-Managed break-even calculator</span>
+      <h1>Run the numbers<br>for your fair.</h1>
+      <p>Project your revenue, see how many upgrades you'd need to sell to cover the license, or work out the rates that hit your revenue goal.</p>
+    </div>
+
+    <div class="calc" id="calc">
+      <div class="calc-inputs">
+        <div class="calc-top">
+        <div class="calc-tabs" role="tablist" aria-label="Calculator view">
+          <button class="calc-tab" type="button" role="tab" aria-selected="true" data-mode="projection">Projection</button>
+          <button class="calc-tab" type="button" role="tab" aria-selected="false" data-mode="quota">Quota</button>
+          <button class="calc-tab" type="button" role="tab" aria-selected="false" data-mode="pricing">Pricing</button>
+        </div>
+        <button type="button" class="calc-clear" id="c-clear">Clear all</button>
+        </div>
+        <p class="calc-desc" id="c-desc">See your projected profit. Enter your fair&rsquo;s details, your rates and how many upgrades you expect to sell.</p>
+
+        <div class="calc-group">
+          <h4>Your fair</h4>
+          <div class="calc-grid">
+            <div class="calc-field">
+              <label for="c-att">Prior-year attendance</label>
+              <input id="c-att" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter attendance">
+              <small>License is 1%: <b id="c-lic-hint">&mdash;</b></small>
+            </div>
+            <div class="calc-field">
+              <label for="c-vendors">Approx. number of vendors</label>
+              <input id="c-vendors" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter vendors">
+            </div>
+            <div class="calc-field">
+              <label for="c-days">Fair days</label>
+              <input id="c-days" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter days">
+              <small><b id="c-slots-hint">&mdash;</b> featured slots (3 per day)</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-group" id="c-goal-wrap" hidden>
+          <h4>Your goal</h4>
+          <div class="calc-field">
+            <label for="c-target">Target revenue</label>
+            <div class="money"><input id="c-target" type="text" inputmode="decimal" autocomplete="off" placeholder="Enter attendance first"></div>
+            <input id="c-target-range" class="calc-range" type="range" min="0" max="10000" step="50" value="0" aria-label="Adjust target revenue">
+            <small><span id="c-target-net">Starts at break-even, the cost of your license.</span> <button type="button" class="calc-link-btn" id="c-target-reset" hidden>Reset to break-even</button></small>
+          </div>
+        </div>
+
+        <div class="calc-group" id="c-rates-group">
+          <h4>Your rates</h4>
+          <div class="calc-grid">
+            <div class="calc-field">
+              <label for="c-prem">Premium listing <span class="opt">(per event)</span></label>
+              <div class="money"><input id="c-prem" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+            </div>
+            <div class="calc-field">
+              <label for="c-feat">Featured spot <span class="opt">(per slot)</span></label>
+              <div class="money"><input id="c-feat" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-group">
+          <h4>Expected sales</h4>
+          <div class="calc-grid">
+            <div class="calc-field" id="c-sold-wrap">
+              <label for="c-sold">Premium upgrades sold <span class="calc-solved" id="c-sold-solved" hidden>Calculated</span></label>
+              <input id="c-sold" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+              <small id="c-sold-pct">&nbsp;</small>
+            </div>
+            <div class="calc-field">
+              <label for="c-booked">Featured slots booked <span class="calc-solved" id="c-booked-solved" hidden>Calculated</span></label>
+              <input id="c-booked" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+              <small id="c-booked-pct">&nbsp;</small>
+            </div>
+          </div>
+          <p class="calc-tip" id="c-sales-tip" hidden>Enter the sales you expect for one upgrade and the other field locks and shows how many you&rsquo;d need to break even. Leave both blank to see each upgrade&rsquo;s break-even on its own.</p>
+        </div>
+
+        <div class="calc-group" id="c-ratio-group" hidden>
+          <h4>Your price multiple</h4>
+          <div class="calc-field">
+            <label for="c-ratio">Featured price multiple</label>
+            <div class="times"><input id="c-ratio" type="text" inputmode="decimal" autocomplete="off" value="1"></div>
+            <small>How many times more a Featured slot costs than a Premium listing (1&times; to 999&times;). Try a few to see how the prices shift.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-results" aria-live="polite">
+        <!-- Empty state -->
+        <div id="r-empty" class="calc-empty">
+          <h4>Your results</h4>
+          <p class="calc-empty-big">Enter your fair&rsquo;s details to see your numbers.</p>
+          <p class="calc-sub" id="r-empty-sub">Add your prior-year attendance, number of vendors, fair days and at least one rate.</p>
+        </div>
+
+        <!-- Projection view -->
+        <div id="r-projection" hidden>
+          <h4>Projected net to your fair</h4>
+          <div class="calc-big" id="r-net">$0</div>
+          <p class="calc-sub" id="r-net-sub"></p>
+          <div class="calc-rows">
+            <div class="calc-row"><span id="r-prem-label">Premium</span><b id="r-prem">$0</b></div>
+            <div class="calc-row"><span id="r-feat-label">Featured</span><b id="r-feat">$0</b></div>
+            <div class="calc-row total"><span>Total revenue</span><b id="r-total">$0</b></div>
+            <div class="calc-row"><span>Annual license</span><b id="r-lic">&minus;$0</b></div>
+          </div>
+          <div class="calc-bars">
+            <div><div class="bar-label"><span>Revenue</span><span id="r-bar-rev-v">$0</span></div><div class="bar"><span class="rev" id="r-bar-rev"></span></div></div>
+            <div><div class="bar-label"><span>License</span><span id="r-bar-lic-v">$0</span></div><div class="bar"><span class="lic" id="r-bar-lic"></span></div></div>
+          </div>
+        </div>
+
+        <!-- Quota view -->
+        <div id="r-quota" hidden>
+          <h4 id="q-head">Upgrades needed to break even</h4>
+          <div class="calc-big" id="q-need">&mdash;</div>
+          <p class="calc-sub" id="q-need-sub"></p>
+          <div class="calc-rows" id="q-rows">
+            <div class="calc-row"><span>Annual license</span><b id="q-lic">$0</b></div>
+            <div class="calc-row"><span id="q-known-label">Expected revenue</span><b id="q-known">$0</b></div>
+            <div class="calc-row total"><span id="q-left-label">Left to cover</span><b id="q-left">$0</b></div>
+          </div>
+          <div class="p-opts" style="margin-bottom:0">
+            <div class="p-opt" id="q-opt-prem">
+              <div><div class="p-opt-label">Premium only</div><small id="q-prem-only-sub"></small></div>
+              <b id="q-prem-only">&mdash;</b>
+            </div>
+            <div class="p-opt" id="q-opt-feat">
+              <div><div class="p-opt-label">Featured only</div><small id="q-feat-only-sub"></small></div>
+              <b id="q-feat-only">&mdash;</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing view -->
+        <div id="r-pricing" hidden>
+          <h4>Rates to hit your goal</h4>
+          <p class="calc-sub" id="p-sub"></p>
+          <div class="p-opts">
+            <div class="p-opt both" id="p-opt-both">
+              <div class="p-opt-label" id="p-both-label">Selling both</div>
+              <div class="p-pair">
+                <div><small>Premium</small><b id="p-both-prem">&mdash;</b><small>each</small></div>
+                <div><small>Featured</small><b id="p-both-feat">&mdash;</b><small>per slot</small></div>
+              </div>
+            </div>
+            <div class="p-opt" id="p-opt-prem">
+              <div><div class="p-opt-label">Premium only</div><small id="p-prem-only-sub"></small></div>
+              <b id="p-prem-only">&mdash;</b>
+            </div>
+            <div class="p-opt" id="p-opt-feat">
+              <div><div class="p-opt-label">Featured only</div><small id="p-feat-only-sub"></small></div>
+              <b id="p-feat-only">&mdash;</b>
+            </div>
+          </div>
+          <div class="calc-rows">
+            <div class="calc-row"><span>Target revenue</span><b id="p-target">$0</b></div>
+            <div class="calc-row"><span>Annual license</span><b id="p-lic">&minus;$0</b></div>
+            <div class="calc-row total"><span>Net to your fair</span><b id="p-net">$0</b></div>
+          </div>
+        </div>
+
+        <div class="calc-note" id="r-note"></div>
+      </div>
+    </div>
+    <p class="calc-foot">Estimates only. Your fair sets its own rates and keeps 100% of Premium and Featured revenue on the Self-Managed plan.</p>
+  </div>
+</main>
+
+<section class="calc-cta">
+  <div class="wrap reveal">
+    <span class="kicker" style="color:#FFD27A">Like what you see?</span>
+    <h2>Let&rsquo;s talk about your fair.</h2>
+    <p>We&rsquo;ll walk you through the fairgoer app, the vendor tools and the admin portal, and help you set rates that fit your fair.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="fairs.html?plan=Self-Managed#demo">Book a Demo</a>
+      <a class="btn btn-ghost" href="fairs.html#plans">Compare Plans</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Fair Friend · <a href="mailto:info@fairfriend.app" style="margin-left:0">info@fairfriend.app</a></span>
+    <span><a href="https://www.fairfriend.app/">Home</a><a href="https://www.fairfriend.app/privacy.html">Privacy</a><a href="https://www.fairfriend.app/terms.html">Terms</a></span>
+  </div>
+</footer>
+
+<script>
+  /* ── Mobile menu ── */
+  (function(){
+    const nav = document.querySelector('.nav');
+    const btn = nav.querySelector('.menu-btn');
+    function setOpen(open){
+      nav.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
+    btn.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+    nav.querySelectorAll('.mobile-menu a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+    document.addEventListener('click', e => { if (!nav.contains(e.target)) setOpen(false); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 760) setOpen(false); });
+  })();
+
+  /* ── Break-even calculator ──
+     License = 1% of prior-year attendance. Featured slots = 3 per fair day.
+     Projection: revenue from expected sales minus the license.
+     Quota: given featured slots booked, how many Premium upgrades cover the rest. */
+  (function(){
+    const $ = id => document.getElementById(id);
+    const el = {
+      att:$('c-att'), vendors:$('c-vendors'), days:$('c-days'), prem:$('c-prem'), feat:$('c-feat'),
+      sold:$('c-sold'), booked:$('c-booked')
+    };
+    if (!el.att) return;
+    const usd = new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 });
+    const num = new Intl.NumberFormat('en-US');
+    // Accepts "356,000", "$45" or "356000"; blank returns NaN so we can tell it apart from zero.
+    const raw = input => parseFloat(String(input.value).replace(/[^0-9.]/g, ''));
+    const val = (input, min = 0) => { const n = raw(input); return isFinite(n) ? Math.max(min, n) : min; };
+    const filled = input => isFinite(raw(input)) && raw(input) > 0;
+    const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '0%';
+    const plural = (n, word) => num.format(n) + ' ' + word + (n === 1 ? '' : 's');
+    let mode = 'projection';
+    const target = $('c-target'), range = $('c-target-range');
+    let targetDirty = false;   // false = target follows the license (break-even)
+    const DESC = {
+      projection: 'See your projected profit. Enter your fair&rsquo;s details, your rates and how many upgrades you expect to sell.',
+      quota: 'Set a sales target. Enter your fair&rsquo;s details and your rates, and see how many Premium upgrades, featured slots or both you&rsquo;d need to sell to cover the license.',
+      pricing: 'Find your rates. Enter your fair&rsquo;s details, a revenue goal, your expected sales and a price multiple, and see what to charge for Premium, Featured or both.'
+    };
+    // Featured price multiple (Pricing only): links the two prices in the "Selling both" option.
+    const ratio = $('c-ratio');
+    let lastPlan = null;
+    const ratioVal = () => { const n = parseFloat(String(ratio.value).replace(/[^0-9.]/g, '')); return isFinite(n) ? Math.min(999, Math.max(1, n)) : 1; };
+    // Locks a field the calculator is solving for and shows the answer in it.
+    function lockRate(input, tag, locked, shown){
+      input.disabled = locked;
+      input.placeholder = locked ? shown : '0';
+      tag.hidden = !locked;
+    }
+
+    function calc(){
+      const att = val(el.att), vendors = Math.round(val(el.vendors, 1)), days = Math.round(val(el.days, 1));
+      const prem = val(el.prem), feat = val(el.feat);
+      const slots = days * 3;
+      const license = Math.round(att * 0.01);
+      const sold = Math.min(Math.round(val(el.sold)), vendors);
+      const booked = Math.min(Math.round(val(el.booked)), slots);
+
+      $('c-lic-hint').textContent = filled(el.att) ? usd.format(license) : '—';
+      $('c-slots-hint').textContent = filled(el.days) ? num.format(slots) : '—';
+      $('c-sold-pct').innerHTML = filled(el.vendors) && el.sold.value !== ''
+        ? pct(sold, vendors) + ' of vendors' + (val(el.sold) > vendors ? ' (capped at vendor count)' : '') : '&nbsp;';
+      $('c-booked-pct').innerHTML = filled(el.days) && el.booked.value !== ''
+        ? pct(booked, slots) + ' of ' + num.format(slots) + ' slots' + (val(el.booked) > slots ? ' (capped)' : '') : '&nbsp;';
+
+      // Pricing goal: starts at break-even (the license) and follows attendance until the visitor changes it.
+      if (!targetDirty && document.activeElement !== target) target.value = filled(el.att) ? num.format(license) : '';
+      const goal = targetDirty ? val(target) : license;
+      const rangeMax = Math.max(1000, Math.ceil(Math.max(license * 5, goal) / 100) * 100);  // fixed scale so dragging doesn't stretch it
+      range.max = rangeMax;
+      range.step = Math.max(10, Math.round(rangeMax / 400 / 10) * 10);
+      range.value = goal;
+      range.disabled = !filled(el.att);
+      const goalNet = goal - license;
+      $('c-target-net').textContent = !filled(el.att) ? 'Starts at break-even, the cost of your license.'
+        : 'Net to your fair: ' + (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet)) + (goalNet === 0 ? ' (break-even)' : '') + '.';
+      $('c-target-reset').hidden = !targetDirty;
+
+      // Results wait until the fair's details are in, plus a rate (Projection, Quota) or expected sales (Pricing).
+      const base = filled(el.att) && filled(el.vendors) && filled(el.days);
+      const ready = mode === 'pricing' ? base && (sold > 0 || booked > 0) : base && (filled(el.prem) || filled(el.feat));
+      $('r-empty-sub').textContent = mode === 'pricing'
+        ? 'Add your prior-year attendance, number of vendors, fair days and how many upgrades you expect to sell.'
+        : 'Add your prior-year attendance, number of vendors, fair days and at least one rate.';
+      $('r-empty').hidden = ready;
+      $('r-projection').hidden = !ready || mode !== 'projection';
+      $('r-quota').hidden = !ready || mode !== 'quota';
+      $('r-pricing').hidden = !ready || mode !== 'pricing';
+      const quota = mode === 'quota', sHas = filled(el.sold), bHas = filled(el.booked);
+      lockRate(el.booked, $('c-booked-solved'), quota && ready && sHas && !bHas, 'Calculated');
+      lockRate(el.sold, $('c-sold-solved'), quota && ready && bHas && !sHas, 'Calculated');
+      if (!ready) { $('r-note').innerHTML = ''; lastPlan = null; return; }
+
+      const featRev = booked * feat;
+      const note = $('r-note');
+
+      if (mode === 'projection') {
+        const premRev = sold * prem, total = premRev + featRev, net = total - license;
+        $('r-net').textContent = (net < 0 ? '−' : '') + usd.format(Math.abs(net));
+        $('r-net').classList.toggle('neg', net < 0);
+        $('r-net-sub').textContent = license > 0 ? 'Revenue covers ' + Math.round(total / license * 100) + '% of the license' : '';
+        $('r-prem-label').textContent = 'Premium (' + num.format(sold) + ' × ' + usd.format(prem) + ')';
+        $('r-feat-label').textContent = 'Featured (' + num.format(booked) + ' × ' + usd.format(feat) + ')';
+        $('r-prem').textContent = usd.format(premRev);
+        $('r-feat').textContent = usd.format(featRev);
+        $('r-total').textContent = usd.format(total);
+        $('r-lic').textContent = '−' + usd.format(license);
+        const max = Math.max(total, license, 1);
+        $('r-bar-rev').style.width = (total / max * 100) + '%';
+        $('r-bar-lic').style.width = (license / max * 100) + '%';
+        $('r-bar-rev-v').textContent = usd.format(total);
+        $('r-bar-lic-v').textContent = usd.format(license);
+        if (net >= 0) {
+          note.innerHTML = '<span class="pill good">Profitable</span><br>' +
+            (premRev >= license ? 'Premium sales alone cover the license, so every Featured slot is profit for your fair.'
+                                : 'Your fair clears the license and keeps the rest.');
+        } else {
+          const need = prem > 0 ? Math.ceil(-net / prem) : null;
+          note.innerHTML = '<span class="pill warn">Short of break-even</span><br>' +
+            (need !== null ? 'About ' + plural(need, 'more Premium upgrade') + ' would close the gap. Try the Quota view to set a target.'
+                           : 'Set a Premium or Featured rate to see your break-even point.');
+        }
+      } else if (mode === 'quota') {
+        // Quota: break-even sales counts. Enter one upgrade's expected sales to solve for the other.
+        const premOnly = prem > 0 ? Math.ceil(license / prem) : null;
+        const featOnly = feat > 0 ? Math.ceil(license / feat) : null;
+        $('q-opt-prem').hidden = premOnly === null;
+        $('q-opt-feat').hidden = featOnly === null;
+        if (premOnly !== null) { $('q-prem-only').textContent = plural(premOnly, 'upgrade'); $('q-prem-only-sub').textContent = pct(premOnly, vendors) + ' of vendors at ' + usd.format(prem) + (premOnly > vendors ? ', more than you have' : ''); }
+        if (featOnly !== null) { $('q-feat-only').textContent = plural(featOnly, 'slot'); $('q-feat-only-sub').textContent = 'of ' + num.format(slots) + ' at ' + usd.format(feat) + (featOnly > slots ? ', more than you have' : ''); }
+        $('q-lic').textContent = usd.format(license);
+        const big = $('q-need'), head = $('q-head'), sub = $('q-need-sub');
+        big.classList.remove('neg');
+        $('q-rows').hidden = false;
+
+        if (sHas && bHas) {
+          const rev = sold * prem + featRev;
+          head.textContent = 'Your expected sales bring in';
+          big.textContent = usd.format(rev);
+          sub.textContent = license > 0 ? Math.round(rev / license * 100) + '% of your license' : '';
+          $('q-known-label').textContent = 'Premium + Featured';
+          $('q-known').textContent = usd.format(rev);
+          $('q-left-label').textContent = rev >= license ? 'Above break-even' : 'Still to cover';
+          $('q-left').textContent = usd.format(Math.abs(rev - license));
+          note.innerHTML = rev >= license
+            ? '<span class="pill good">Break-even reached</span><br>These sales cover the license. Clear one of them to see the exact quota for it.'
+            : '<span class="pill warn">Short by ' + usd.format(license - rev) + '</span><br>Clear one of your expected sales and the calculator will show how many of that upgrade you need.';
+        } else if (sHas || bHas) {
+          const solvingFeat = sHas;   // Premium sales entered → solve featured slots
+          const knownRev = solvingFeat ? sold * prem : featRev;
+          const rate = solvingFeat ? feat : prem;
+          const cap = solvingFeat ? slots : vendors;
+          const left = Math.max(0, license - knownRev);
+          head.textContent = solvingFeat ? 'Featured slots needed to break even' : 'Premium upgrades needed to break even';
+          $('q-known-label').textContent = solvingFeat ? 'Premium (' + num.format(sold) + ' × ' + usd.format(prem) + ')' : 'Featured (' + num.format(booked) + ' × ' + usd.format(feat) + ')';
+          $('q-known').textContent = usd.format(knownRev);
+          $('q-left-label').textContent = 'Left for ' + (solvingFeat ? 'Featured' : 'Premium') + ' to cover';
+          $('q-left').textContent = usd.format(left);
+          if (left === 0) {
+            big.textContent = '0';
+            (solvingFeat ? el.booked : el.sold).placeholder = '0';
+            sub.textContent = (solvingFeat ? 'Premium' : 'Featured') + ' sales already cover the license';
+            note.innerHTML = '<span class="pill good">Covered by ' + (solvingFeat ? 'Premium' : 'Featured') + '</span><br>Your ' + (solvingFeat ? 'Premium upgrades' : 'featured bookings') +
+              ' already cover the license, so every ' + (solvingFeat ? 'featured slot' : 'Premium upgrade') + ' is profit.';
+          } else if (!(rate > 0)) {
+            big.textContent = '—';
+            sub.textContent = 'Set a ' + (solvingFeat ? 'Featured' : 'Premium') + ' rate to see this quota';
+            note.innerHTML = '';
+          } else {
+            const need = Math.ceil(left / rate);
+            big.textContent = num.format(need);
+            (solvingFeat ? el.booked : el.sold).placeholder = num.format(need);
+            sub.textContent = solvingFeat ? pct(need, slots) + ' of your ' + num.format(slots) + ' slots at ' + usd.format(feat) + ' each'
+                                          : pct(need, vendors) + ' of your ' + num.format(vendors) + ' vendors at ' + usd.format(prem) + ' each';
+            note.innerHTML = need <= cap
+              ? '<span class="pill good">Your sales target</span><br>Sell ' + plural(solvingFeat ? sold : need, 'Premium upgrade') + ' and book ' +
+                plural(solvingFeat ? need : booked, 'featured slot') + ' to break even. Everything beyond that is profit.'
+              : '<span class="pill warn">Not reachable at these rates</span><br>You would need more ' + (solvingFeat ? 'featured slots than your fair has' : 'upgrades than you have vendors') +
+                '. Raise your rates or increase your expected ' + (solvingFeat ? 'Premium sales' : 'featured bookings') + '.';
+          }
+        } else {
+          head.textContent = 'Upgrades needed to break even';
+          big.textContent = 'Pick one';
+          sub.textContent = 'Each option below covers the license with one upgrade type. Enter expected sales for one upgrade to see how many of the other you need.';
+          $('q-rows').hidden = true;
+          note.innerHTML = '';
+        }
+      } else {
+        // Pricing: up to three options at the visitor's expected sales.
+        //   Premium only / Featured only: the whole goal from one upgrade type.
+        //   Both: Premium + Featured together, linked by the multiple, or by the one rate the visitor entered.
+        $('p-target').textContent = usd.format(goal);
+        $('p-lic').textContent = '−' + usd.format(license);
+        $('p-net').textContent = (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet));
+        $('p-sub').textContent = 'Based on ' + [sold > 0 ? plural(sold, 'Premium upgrade') + ' sold' : '', booked > 0 ? plural(booked, 'featured slot') + ' booked' : ''].filter(Boolean).join(' and ') + '.';
+
+        $('p-opt-prem').hidden = !(sold > 0);
+        $('p-opt-feat').hidden = !(booked > 0);
+        if (sold > 0) { $('p-prem-only').textContent = usd.format(Math.ceil(goal / sold)); $('p-prem-only-sub').textContent = 'each, with no featured sales'; }
+        if (booked > 0) { $('p-feat-only').textContent = usd.format(Math.ceil(goal / booked)); $('p-feat-only-sub').textContent = 'per slot, with no Premium sales'; }
+
+        const both = sold > 0 && booked > 0;
+        $('p-opt-both').hidden = !both;
+        const r = ratioVal();
+        const plan = (p, f) => 'Charge ' + usd.format(p) + ' for Premium and ' + usd.format(f) + ' per featured slot, sell ' + plural(sold, 'upgrade') +
+          ' and book ' + plural(booked, 'slot') + ', and your fair nets about ' + (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet)) + '.';
+        lastPlan = null;
+
+        if (!both) {
+          note.innerHTML = '<span class="pill warn">One upgrade type</span><br>Add both Premium upgrades sold and featured slots booked to see rates for selling both.';
+        } else {
+          const per = goal / (sold + r * booked);
+          const p = Math.ceil(per), f = Math.ceil(per * r);
+          $('p-both-label').textContent = 'Selling both, Featured at ' + num.format(r) + '× Premium';
+          $('p-both-prem').textContent = usd.format(p);
+          $('p-both-feat').textContent = usd.format(f);
+          lastPlan = { p, f };
+          note.innerHTML = '<span class="pill good">Your pricing plan</span><br>' + plan(p, f);
+        }
+      }
+    }
+
+    document.querySelectorAll('.calc-tab').forEach(tab => tab.addEventListener('click', () => {
+      // Leaving Pricing: keep the solved rate as a real entry so the other views use it.
+      if (mode === 'pricing' && tab.dataset.mode !== 'pricing') {
+        if (lastPlan) { el.prem.value = num.format(lastPlan.p); el.feat.value = num.format(lastPlan.f); }
+      }
+      // Leaving Quota: keep the solved sales count as a real entry.
+      if (mode === 'quota' && tab.dataset.mode !== 'quota') {
+        [el.sold, el.booked].forEach(input => {
+          if (input.disabled && isFinite(raw({ value: input.placeholder }))) input.value = input.placeholder;
+        });
+      }
+      mode = tab.dataset.mode;
+      document.querySelectorAll('.calc-tab').forEach(t => t.setAttribute('aria-selected', t === tab));
+      $('c-desc').innerHTML = DESC[mode];
+      $('c-sales-tip').hidden = mode !== 'quota';
+      $('c-goal-wrap').hidden = mode !== 'pricing';
+      $('c-rates-group').hidden = mode === 'pricing';
+      $('c-ratio-group').hidden = mode !== 'pricing';
+      calc();
+    }));
+    Object.values(el).forEach(input => {
+      input.addEventListener('input', calc);
+      // Tidy the number when the visitor leaves the field: 356000 → 356,000
+      input.addEventListener('blur', () => {
+        const n = raw(input);
+        if (input.value.trim() === '') return;
+        input.value = isFinite(n) ? num.format(n) : '';
+        calc();
+      });
+    });
+    // Typing in the goal takes it off break-even right away, even mid-edit with the box cleared.
+    // Leaving the box empty puts it back on break-even.
+    target.addEventListener('input', () => { targetDirty = true; calc(); });
+    target.addEventListener('blur', () => {
+      if (target.value.trim() === '' || !isFinite(raw(target))) targetDirty = false;
+      else target.value = num.format(raw(target));
+      calc();
+    });
+    range.addEventListener('input', () => { targetDirty = true; target.value = num.format(Number(range.value)); calc(); });
+    $('c-target-reset').addEventListener('click', () => { targetDirty = false; calc(); });
+    ratio.addEventListener('input', calc);
+    ratio.addEventListener('blur', () => {
+      const n = parseFloat(ratio.value.replace(/[^0-9.]/g, ''));
+      ratio.value = isFinite(n) ? String(Math.round(Math.min(999, Math.max(1, n)) * 10) / 10) : '1';
+      calc();
+    });
+    $('c-clear').addEventListener('click', () => {
+      Object.values(el).forEach(input => { input.value = ''; });
+      ratio.value = '1';
+      targetDirty = false;
+      calc();
+      el.att.focus();
+    });
+    calc();
+  })();
+
+  /* ── Scroll reveal ── */
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+  }), { threshold:.12 }) : null;
+  document.querySelectorAll('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+</script>
+</body>
+</html>
