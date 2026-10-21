@@ -268,6 +268,18 @@
   .calc-inputs input:disabled{ background:var(--tint); color:var(--muted); border-style:dashed; cursor:not-allowed; -webkit-text-fill-color:var(--muted); opacity:1; }
   .calc-inputs input:disabled::placeholder{ color:var(--navy); font-weight:600; opacity:.75; }
   .calc-solved{ display:inline-block; margin-left:4px; font-size:10.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--sky); background:#E6F2FB; border-radius:999px; padding:1px 8px; vertical-align:1px; }
+  .times{ position:relative; max-width:160px; }
+  .times::after{ content:"\00D7"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:700; font-size:16px; pointer-events:none; }
+  .times input{ padding-right:32px; }
+  .p-opts{ display:grid; gap:10px; margin:18px 0 22px; }
+  .p-opt{ display:flex; justify-content:space-between; align-items:center; gap:12px; border-radius:14px; padding:12px 14px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); }
+  .p-opt > b{ font-size:20px; font-weight:800; white-space:nowrap; }
+  .p-opt small{ display:block; font-size:12px; color:rgba(255,255,255,.7); }
+  .p-opt-label{ font-size:12px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:rgba(255,255,255,.85); }
+  .p-opt.both{ display:block; background:rgba(232,137,12,.14); border-color:rgba(255,197,107,.55); padding:14px 16px; }
+  .p-opt.both .p-opt-label{ color:#FFC56B; }
+  .p-pair{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; }
+  .p-pair b{ display:block; font-size:clamp(26px,3.2vw,32px); font-weight:800; line-height:1.15; }
   [hidden]{ display:none !important; }
   @media (max-width:860px){ .calc{ grid-template-columns:1fr; } }
   @media (max-width:480px){ .calc-inputs, .calc-results{ padding:24px 20px; } .calc-grid{ grid-template-columns:1fr; } }
@@ -547,7 +559,12 @@
               <div class="money"><input id="c-feat" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
             </div>
           </div>
-          <p class="calc-tip" id="c-rates-tip" hidden>Enter the rate you&rsquo;re most sure of. The other field locks and shows the rate you&rsquo;d need to hit your goal. Clear your rate to unlock it.</p>
+          <div class="calc-field" id="c-ratio-wrap" hidden style="margin-top:14px">
+            <label for="c-ratio">Featured price multiple <span class="calc-solved" id="c-ratio-solved" hidden>Calculated</span></label>
+            <div class="times"><input id="c-ratio" type="text" inputmode="decimal" autocomplete="off" value="1"></div>
+            <small>How many times more a Featured slot costs than a Premium listing (1&times; to 999&times;).</small>
+          </div>
+          <p class="calc-tip" id="c-rates-tip" hidden>Leave both rates blank and the calculator prices each option for you using your multiple. Or enter the rate you&rsquo;re sure of, and the other rate locks and shows what it needs to be.</p>
         </div>
 
         <div class="calc-group">
@@ -610,17 +627,29 @@
 
         <!-- Pricing view -->
         <div id="r-pricing" hidden>
-          <h4 id="p-head">Rates to hit your goal</h4>
-          <div class="calc-big" id="p-big">&mdash;</div>
+          <h4>Rates to hit your goal</h4>
           <p class="calc-sub" id="p-sub"></p>
+          <div class="p-opts">
+            <div class="p-opt both" id="p-opt-both">
+              <div class="p-opt-label" id="p-both-label">Selling both</div>
+              <div class="p-pair">
+                <div><small>Premium</small><b id="p-both-prem">&mdash;</b><small>each</small></div>
+                <div><small>Featured</small><b id="p-both-feat">&mdash;</b><small>per slot</small></div>
+              </div>
+            </div>
+            <div class="p-opt" id="p-opt-prem">
+              <div><div class="p-opt-label">Premium only</div><small id="p-prem-only-sub"></small></div>
+              <b id="p-prem-only">&mdash;</b>
+            </div>
+            <div class="p-opt" id="p-opt-feat">
+              <div><div class="p-opt-label">Featured only</div><small id="p-feat-only-sub"></small></div>
+              <b id="p-feat-only">&mdash;</b>
+            </div>
+          </div>
           <div class="calc-rows">
             <div class="calc-row"><span>Target revenue</span><b id="p-target">$0</b></div>
             <div class="calc-row"><span>Annual license</span><b id="p-lic">&minus;$0</b></div>
             <div class="calc-row total"><span>Net to your fair</span><b id="p-net">$0</b></div>
-          </div>
-          <div class="calc-rows" style="margin-top:18px">
-            <div class="calc-row"><span id="p-prem-only-label">Premium alone would need</span><b id="p-prem-only"></b></div>
-            <div class="calc-row"><span id="p-feat-only-label">Featured alone would need</span><b id="p-feat-only"></b></div>
           </div>
         </div>
 
@@ -799,8 +828,24 @@
     const DESC = {
       projection: 'See your projected profit. Enter your fair&rsquo;s details, your rates and how many upgrades you expect to sell.',
       quota: 'Set a sales target. Enter your fair&rsquo;s details, your rates and the featured slots you expect to book, and see how many Premium upgrades cover the license.',
-      pricing: 'Find your rates. Enter your fair&rsquo;s details, a revenue goal, your expected sales and one rate, and the calculator solves for the other.'
+      pricing: 'Find your rates. Enter your fair&rsquo;s details, a revenue goal and your expected sales, and see what to charge for Premium, Featured or both.'
     };
+    // Featured price multiple (Pricing only). Locks to show the implied multiple when the visitor enters one rate.
+    const ratio = $('c-ratio');
+    let ratioLocked = false, userRatio = '1', lastPlan = null;
+    const ratioVal = () => { const n = parseFloat(String(ratioLocked ? userRatio : ratio.value).replace(/[^0-9.]/g, '')); return isFinite(n) ? Math.min(999, Math.max(1, n)) : 1; };
+    function lockRatio(lock, implied){
+      if (lock) {
+        if (!ratioLocked) { userRatio = ratio.value; ratioLocked = true; }
+        ratio.disabled = true;
+        ratio.value = implied;
+      } else if (ratioLocked) {
+        ratio.disabled = false;
+        ratio.value = userRatio;
+        ratioLocked = false;
+      }
+      $('c-ratio-solved').hidden = !ratioLocked;
+    }
     // In Pricing, the rate being solved is locked and shows the answer; elsewhere both rates are open.
     function lockRate(input, tag, locked, shown){
       input.disabled = locked;
@@ -849,7 +894,8 @@
       const pricing = mode === 'pricing', pHas = filled(el.prem), fHas = filled(el.feat);
       lockRate(el.feat, $('c-feat-solved'), pricing && pHas && !fHas, 'Calculated');
       lockRate(el.prem, $('c-prem-solved'), pricing && fHas && !pHas, 'Calculated');
-      if (!ready) { $('r-note').innerHTML = ''; return; }
+      if (!pricing || !ready || !(pHas !== fHas)) lockRatio(false);
+      if (!ready) { $('r-note').innerHTML = ''; lastPlan = null; return; }
 
       const featRev = booked * feat;
       const note = $('r-note');
@@ -904,63 +950,59 @@
           note.innerHTML = '<span class="pill warn">Not reachable at these rates</span><br>You would need more upgrades than you have vendors. Raise your rates or book more featured slots.';
         }
       } else {
-        // Pricing: solve for whichever rate is left blank so revenue reaches the goal.
+        // Pricing: up to three options at the visitor's expected sales.
+        //   Premium only / Featured only: the whole goal from one upgrade type.
+        //   Both: Premium + Featured together, linked by the multiple, or by the one rate the visitor entered.
         $('p-target').textContent = usd.format(goal);
         $('p-lic').textContent = '−' + usd.format(license);
         $('p-net').textContent = (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet));
-        const premOnly = sold > 0 ? Math.ceil(goal / sold) : null;
-        const featOnly = booked > 0 ? Math.ceil(goal / booked) : null;
-        $('p-prem-only-label').textContent = 'Premium alone' + (sold > 0 ? ' (' + plural(sold, 'upgrade') + ')' : '') + ' would need';
-        $('p-feat-only-label').textContent = 'Featured alone' + (booked > 0 ? ' (' + plural(booked, 'slot') + ')' : '') + ' would need';
-        $('p-prem-only').textContent = premOnly === null ? 'add upgrades sold' : usd.format(premOnly) + ' each';
-        $('p-feat-only').textContent = featOnly === null ? 'add slots booked' : usd.format(featOnly) + ' per slot';
-        const pIn = filled(el.prem), fIn = filled(el.feat), big = $('p-big'), head = $('p-head'), sub = $('p-sub');
-        lockRate(el.feat, $('c-feat-solved'), pIn && !fIn, 'Calculated');
-        lockRate(el.prem, $('c-prem-solved'), fIn && !pIn, 'Calculated');
-        big.classList.remove('neg');
-        const summary = (p, f) => '<span class="pill good">Your pricing plan</span><br>Charge ' + usd.format(p) + ' for Premium and ' + usd.format(f) +
-          ' per featured slot, sell ' + plural(sold, 'upgrade') + ' and book ' + plural(booked, 'slot') + ', and your fair nets about ' +
-          (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet)) + '.';
-        const flip = (f, p) => f < p
-          ? '<br><br>At these numbers Featured would cost less than Premium. Consider raising your Featured rate so the scarce slots stay premium.' : '';
+        $('p-sub').textContent = 'Based on ' + [sold > 0 ? plural(sold, 'Premium upgrade') + ' sold' : '', booked > 0 ? plural(booked, 'featured slot') + ' booked' : ''].filter(Boolean).join(' and ') + '.';
 
-        if (pIn && fIn) {
+        $('p-opt-prem').hidden = !(sold > 0);
+        $('p-opt-feat').hidden = !(booked > 0);
+        if (sold > 0) { $('p-prem-only').textContent = usd.format(Math.ceil(goal / sold)); $('p-prem-only-sub').textContent = 'each, with no featured sales'; }
+        if (booked > 0) { $('p-feat-only').textContent = usd.format(Math.ceil(goal / booked)); $('p-feat-only-sub').textContent = 'per slot, with no Premium sales'; }
+
+        const both = sold > 0 && booked > 0;
+        $('p-opt-both').hidden = !both;
+        const pIn = filled(el.prem), fIn = filled(el.feat), r = ratioVal();
+        const plan = (p, f) => 'Charge ' + usd.format(p) + ' for Premium and ' + usd.format(f) + ' per featured slot, sell ' + plural(sold, 'upgrade') +
+          ' and book ' + plural(booked, 'slot') + ', and your fair nets about ' + (goalNet < 0 ? '−' : '') + usd.format(Math.abs(goalNet)) + '.';
+        const flip = (f, p) => f < p ? '<br><br>At these numbers Featured would cost less than Premium. Consider raising your Featured rate so the scarce slots stay premium.' : '';
+        lastPlan = null;
+
+        if (!both) {
+          note.innerHTML = '<span class="pill warn">One upgrade type</span><br>Add both Premium upgrades sold and featured slots booked to see rates for selling both.';
+        } else if (pIn && fIn) {
           const rev = sold * prem + booked * feat;
-          head.textContent = 'Your rates bring in';
-          big.textContent = usd.format(rev);
-          sub.textContent = goal > 0 ? Math.round(rev / goal * 100) + '% of your target revenue' : '';
+          $('p-both-label').textContent = 'Your rates';
+          $('p-both-prem').textContent = usd.format(prem);
+          $('p-both-feat').textContent = usd.format(feat);
           note.innerHTML = rev >= goal
-            ? '<span class="pill good">Goal reached</span><br>These rates hit your target revenue. To fine-tune, clear one rate and the calculator will solve for it again.'
-            : '<span class="pill warn">Short of your goal by ' + usd.format(goal - rev) + '</span><br>Clear one rate and the calculator will work out what it needs to be to hit your goal.';
+            ? '<span class="pill good">Goal reached</span><br>Your rates bring in ' + usd.format(rev) + ', which hits your target. To fine-tune, clear one rate and the calculator will solve for it again.'
+            : '<span class="pill warn">Short of your goal by ' + usd.format(goal - rev) + '</span><br>Your rates bring in ' + usd.format(rev) + '. Clear one rate and the calculator will work out what it needs to be.';
         } else if (pIn || fIn) {
-          const solvingFeat = pIn;
-          const known = solvingFeat ? prem : feat, knownCount = solvingFeat ? sold : booked, otherCount = solvingFeat ? booked : sold;
-          const unit = solvingFeat ? ' per slot' : ' each';
-          head.textContent = solvingFeat ? 'Featured rate needed' : 'Premium rate needed';
-          const needed = goal - known * knownCount;
-          if (otherCount === 0) {
-            big.textContent = '—';
-            sub.textContent = '';
-            note.innerHTML = '<span class="pill warn">Add expected sales</span><br>Enter how many ' + (solvingFeat ? 'featured slots you expect to book' : 'Premium upgrades you expect to sell') + ' to solve for that rate.';
-          } else if (needed <= 0) {
-            big.textContent = usd.format(0);
-            (solvingFeat ? el.feat : el.prem).placeholder = '0';
-            sub.textContent = (solvingFeat ? 'Premium' : 'Featured') + ' alone reaches your goal at ' + usd.format(known) + (solvingFeat ? ' each' : ' per slot');
-            note.innerHTML = '<span class="pill good">Goal covered</span><br>Your ' + (solvingFeat ? 'Premium' : 'Featured') + ' sales already reach your target, so you can set the other rate wherever you like. Every sale is extra profit.';
+          const p = pIn ? prem : Math.max(0, Math.ceil((goal - feat * booked) / sold));
+          const f = fIn ? feat : Math.max(0, Math.ceil((goal - prem * sold) / booked));
+          (pIn ? el.feat : el.prem).placeholder = num.format(pIn ? f : p);
+          lockRatio(true, p > 0 ? String(Math.round(f / p * 10) / 10) : '—');
+          $('p-both-label').textContent = 'Selling both, with your ' + (pIn ? 'Premium' : 'Featured') + ' rate';
+          $('p-both-prem').textContent = usd.format(p);
+          $('p-both-feat').textContent = usd.format(f);
+          lastPlan = { p, f };
+          if ((pIn ? f : p) === 0) {
+            note.innerHTML = '<span class="pill good">Goal covered</span><br>Your ' + (pIn ? 'Premium' : 'Featured') + ' sales already reach your target, so you can set the other rate wherever you like. Every sale is extra profit.';
           } else {
-            const solved = Math.ceil(needed / otherCount);
-            (solvingFeat ? el.feat : el.prem).placeholder = num.format(solved);
-            big.textContent = usd.format(solved) + unit;
-            sub.textContent = 'With ' + (solvingFeat ? 'Premium at ' + usd.format(prem) + ' × ' + num.format(sold) : 'Featured at ' + usd.format(feat) + ' × ' + num.format(booked)) +
-              ' and ' + (solvingFeat ? plural(booked, 'slot') + ' booked' : plural(sold, 'upgrade') + ' sold');
-            const p = solvingFeat ? prem : solved, f = solvingFeat ? solved : feat;
-            note.innerHTML = summary(p, f) + flip(f, p);
+            note.innerHTML = '<span class="pill good">Your pricing plan</span><br>' + plan(p, f) + flip(f, p);
           }
         } else {
-          head.textContent = 'Rates to hit your goal';
-          big.textContent = 'Enter one rate';
-          sub.textContent = 'Fill in the rate you’re most sure of and the other will be solved. The single-upgrade rates below show the most you’d need to charge for either one.';
-          note.innerHTML = '';
+          const per = goal / (sold + r * booked);
+          const p = Math.ceil(per), f = Math.ceil(per * r);
+          $('p-both-label').textContent = 'Selling both, Featured at ' + num.format(r) + '× Premium';
+          $('p-both-prem').textContent = usd.format(p);
+          $('p-both-feat').textContent = usd.format(f);
+          lastPlan = { p, f };
+          note.innerHTML = '<span class="pill good">Your pricing plan</span><br>' + plan(p, f);
         }
       }
     }
@@ -968,9 +1010,7 @@
     document.querySelectorAll('.calc-tab').forEach(tab => tab.addEventListener('click', () => {
       // Leaving Pricing: keep the solved rate as a real entry so the other views use it.
       if (mode === 'pricing' && tab.dataset.mode !== 'pricing') {
-        [el.prem, el.feat].forEach(input => {
-          if (input.disabled && isFinite(raw({ value: input.placeholder }))) input.value = input.placeholder;
-        });
+        if (lastPlan) { el.prem.value = num.format(lastPlan.p); el.feat.value = num.format(lastPlan.f); }
       }
       mode = tab.dataset.mode;
       document.querySelectorAll('.calc-tab').forEach(t => t.setAttribute('aria-selected', t === tab));
@@ -978,6 +1018,7 @@
       $('c-sold-wrap').hidden = mode === 'quota';
       $('c-goal-wrap').hidden = mode !== 'pricing';
       $('c-rates-tip').hidden = mode !== 'pricing';
+      $('c-ratio-wrap').hidden = mode !== 'pricing';
       calc();
     }));
     Object.values(el).forEach(input => {
@@ -994,8 +1035,16 @@
     target.addEventListener('blur', () => { if (targetDirty && isFinite(raw(target))) target.value = num.format(raw(target)); calc(); });
     range.addEventListener('input', () => { targetDirty = true; target.value = num.format(Number(range.value)); calc(); });
     $('c-target-reset').addEventListener('click', () => { targetDirty = false; calc(); });
+    ratio.addEventListener('input', calc);
+    ratio.addEventListener('blur', () => {
+      if (ratioLocked) return;
+      const n = parseFloat(ratio.value.replace(/[^0-9.]/g, ''));
+      ratio.value = isFinite(n) ? String(Math.round(Math.min(999, Math.max(1, n)) * 10) / 10) : '1';
+      calc();
+    });
     $('c-clear').addEventListener('click', () => {
       Object.values(el).forEach(input => { input.value = ''; });
+      lockRatio(false); ratio.value = '1';
       targetDirty = false;
       calc();
       el.att.focus();
