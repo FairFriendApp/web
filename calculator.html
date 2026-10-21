@@ -288,6 +288,16 @@
   /* Inside two-column rows, the Calculated tag sits inside the locked box so labels stay on one line */
   .calc-grid .calc-field{ position:relative; }
   .calc-grid .calc-solved{ position:absolute; right:12px; top:41px; margin:0; vertical-align:baseline; pointer-events:none; }
+  .q-table{ margin-top:10px; }
+  .q-tr{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:9px 0; border-top:1px solid rgba(255,255,255,.14); align-items:baseline; }
+  .q-tr span{ font-size:14px; color:rgba(255,255,255,.9); }
+  .q-tr b{ font-size:20px; font-weight:800; color:#fff; }
+  .q-tr small{ display:block; font-size:12px; color:rgba(255,255,255,.68); }
+  .q-th{ border-top:0; padding-top:0; }
+  .q-th span{ font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .q-tr.off b{ color:rgba(255,255,255,.45); }
+  .q-tr.off small{ color:#FF9B8A; }
+  .q-tr.free small{ color:#9BE3BF; }
   [hidden]{ display:none !important; }
   @media (max-width:860px){ .calc{ grid-template-columns:1fr; } }
   @media (max-width:480px){ .calc-inputs, .calc-results{ padding:24px 20px; } .calc-grid{ grid-template-columns:1fr; } }
@@ -403,21 +413,20 @@
           </div>
         </div>
 
-        <div class="calc-group">
+        <div class="calc-group" id="c-sales-group">
           <h4>Expected sales</h4>
           <div class="calc-grid">
             <div class="calc-field" id="c-sold-wrap">
-              <label for="c-sold">Premium upgrades sold <span class="calc-solved" id="c-sold-solved" hidden>Calculated</span></label>
+              <label for="c-sold">Premium upgrades sold</label>
               <input id="c-sold" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
               <small id="c-sold-pct">&nbsp;</small>
             </div>
             <div class="calc-field">
-              <label for="c-booked">Featured slots booked <span class="calc-solved" id="c-booked-solved" hidden>Calculated</span></label>
+              <label for="c-booked">Featured slots booked</label>
               <input id="c-booked" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
               <small id="c-booked-pct">&nbsp;</small>
             </div>
           </div>
-          <p class="calc-tip" id="c-sales-tip" hidden>Enter the sales you expect for one upgrade and the other field locks and shows how many you&rsquo;d need to break even. Leave both blank to see each upgrade&rsquo;s break-even on its own.</p>
         </div>
 
         <div class="calc-group" id="c-ratio-group" hidden>
@@ -457,15 +466,16 @@
 
         <!-- Quota view -->
         <div id="r-quota" hidden>
-          <h4 id="q-head">Upgrades needed to break even</h4>
-          <div class="calc-big" id="q-need">&mdash;</div>
-          <p class="calc-sub" id="q-need-sub"></p>
-          <div class="calc-rows" id="q-rows">
-            <div class="calc-row"><span>Annual license</span><b id="q-lic">$0</b></div>
-            <div class="calc-row"><span id="q-known-label">Expected revenue</span><b id="q-known">$0</b></div>
-            <div class="calc-row total"><span id="q-left-label">Left to cover</span><b id="q-left">$0</b></div>
-          </div>
-          <div class="p-opts" style="margin-bottom:0">
+          <h4>Sales needed to break even</h4>
+          <p class="calc-sub" id="q-sub"></p>
+          <div class="p-opts">
+            <div class="p-opt both" id="q-opt-both">
+              <div class="p-opt-label">Selling both</div>
+              <div class="q-table" role="table" aria-label="Break-even combinations">
+                <div class="q-tr q-th" role="row"><span role="columnheader">Featured slots booked</span><span role="columnheader">Premium upgrades needed</span></div>
+                <div id="q-both-rows"></div>
+              </div>
+            </div>
             <div class="p-opt" id="q-opt-prem">
               <div><div class="p-opt-label">Premium only</div><small id="q-prem-only-sub"></small></div>
               <b id="q-prem-only">&mdash;</b>
@@ -572,7 +582,7 @@
     let targetDirty = false;   // false = target follows the license (break-even)
     const DESC = {
       projection: 'See your projected profit. Enter your fair&rsquo;s details, your rates and how many upgrades you expect to sell.',
-      quota: 'Set a sales target. Enter your fair&rsquo;s details and your rates, and see how many Premium upgrades, featured slots or both you&rsquo;d need to sell to cover the license.',
+      quota: 'Set a sales target. Enter your fair&rsquo;s details and your rates, and see how many Premium upgrades and featured slots you&rsquo;d need to sell to cover the license.',
       pricing: 'Find your rates. Enter your fair&rsquo;s details, a revenue goal, your expected sales and a price multiple, and see what to charge for Premium, Featured or both.'
     };
     // Featured price multiple (Pricing only): links the two prices in the "Selling both" option.
@@ -624,9 +634,6 @@
       $('r-projection').hidden = !ready || mode !== 'projection';
       $('r-quota').hidden = !ready || mode !== 'quota';
       $('r-pricing').hidden = !ready || mode !== 'pricing';
-      const quota = mode === 'quota', sHas = filled(el.sold), bHas = filled(el.booked);
-      lockRate(el.booked, $('c-booked-solved'), quota && ready && sHas && !bHas, 'Calculated');
-      lockRate(el.sold, $('c-sold-solved'), quota && ready && bHas && !sHas, 'Calculated');
       if (!ready) { $('r-note').innerHTML = ''; lastPlan = null; return; }
 
       const featRev = booked * feat;
@@ -659,69 +666,47 @@
                            : 'Set a Premium or Featured rate to see your break-even point.');
         }
       } else if (mode === 'quota') {
-        // Quota: break-even sales counts. Enter one upgrade's expected sales to solve for the other.
+        // Quota: at the visitor's rates, how many upgrades cover the license.
+        //   Premium only / Featured only: one upgrade type covers it all.
+        //   Selling both: step through a share of the featured slots and show the Premium upgrades still needed.
+        $('q-sub').textContent = 'To cover your ' + usd.format(license) + ' license' +
+          (prem > 0 && feat > 0 ? ' at ' + usd.format(prem) + ' per Premium listing and ' + usd.format(feat) + ' per featured slot.'
+           : prem > 0 ? ' at ' + usd.format(prem) + ' per Premium listing.' : ' at ' + usd.format(feat) + ' per featured slot.');
         const premOnly = prem > 0 ? Math.ceil(license / prem) : null;
         const featOnly = feat > 0 ? Math.ceil(license / feat) : null;
         $('q-opt-prem').hidden = premOnly === null;
         $('q-opt-feat').hidden = featOnly === null;
-        if (premOnly !== null) { $('q-prem-only').textContent = plural(premOnly, 'upgrade'); $('q-prem-only-sub').textContent = pct(premOnly, vendors) + ' of vendors at ' + usd.format(prem) + (premOnly > vendors ? ', more than you have' : ''); }
-        if (featOnly !== null) { $('q-feat-only').textContent = plural(featOnly, 'slot'); $('q-feat-only-sub').textContent = 'of ' + num.format(slots) + ' at ' + usd.format(feat) + (featOnly > slots ? ', more than you have' : ''); }
-        $('q-lic').textContent = usd.format(license);
-        const big = $('q-need'), head = $('q-head'), sub = $('q-need-sub');
-        big.classList.remove('neg');
-        $('q-rows').hidden = false;
+        if (premOnly !== null) {
+          $('q-prem-only').textContent = plural(premOnly, 'upgrade');
+          $('q-prem-only-sub').textContent = pct(premOnly, vendors) + ' of your vendors' + (premOnly > vendors ? ', more than you have' : '');
+        }
+        if (featOnly !== null) {
+          $('q-feat-only').textContent = plural(featOnly, 'slot');
+          $('q-feat-only-sub').textContent = featOnly > slots ? 'more than your ' + num.format(slots) + ' slots' : 'of your ' + num.format(slots) + ' slots';
+        }
 
-        if (sHas && bHas) {
-          const rev = sold * prem + featRev;
-          head.textContent = 'Your expected sales bring in';
-          big.textContent = usd.format(rev);
-          sub.textContent = license > 0 ? Math.round(rev / license * 100) + '% of your license' : '';
-          $('q-known-label').textContent = 'Premium + Featured';
-          $('q-known').textContent = usd.format(rev);
-          $('q-left-label').textContent = rev >= license ? 'Above break-even' : 'Still to cover';
-          $('q-left').textContent = usd.format(Math.abs(rev - license));
-          note.innerHTML = rev >= license
-            ? '<span class="pill good">Break-even reached</span><br>These sales cover the license. Clear one of them to see the exact quota for it.'
-            : '<span class="pill warn">Short by ' + usd.format(license - rev) + '</span><br>Clear one of your expected sales and the calculator will show how many of that upgrade you need.';
-        } else if (sHas || bHas) {
-          const solvingFeat = sHas;   // Premium sales entered → solve featured slots
-          const knownRev = solvingFeat ? sold * prem : featRev;
-          const rate = solvingFeat ? feat : prem;
-          const cap = solvingFeat ? slots : vendors;
-          const left = Math.max(0, license - knownRev);
-          head.textContent = solvingFeat ? 'Featured slots needed to break even' : 'Premium upgrades needed to break even';
-          $('q-known-label').textContent = solvingFeat ? 'Premium (' + num.format(sold) + ' × ' + usd.format(prem) + ')' : 'Featured (' + num.format(booked) + ' × ' + usd.format(feat) + ')';
-          $('q-known').textContent = usd.format(knownRev);
-          $('q-left-label').textContent = 'Left for ' + (solvingFeat ? 'Featured' : 'Premium') + ' to cover';
-          $('q-left').textContent = usd.format(left);
-          if (left === 0) {
-            big.textContent = '0';
-            (solvingFeat ? el.booked : el.sold).placeholder = '0';
-            sub.textContent = (solvingFeat ? 'Premium' : 'Featured') + ' sales already cover the license';
-            note.innerHTML = '<span class="pill good">Covered by ' + (solvingFeat ? 'Premium' : 'Featured') + '</span><br>Your ' + (solvingFeat ? 'Premium upgrades' : 'featured bookings') +
-              ' already cover the license, so every ' + (solvingFeat ? 'featured slot' : 'Premium upgrade') + ' is profit.';
-          } else if (!(rate > 0)) {
-            big.textContent = '—';
-            sub.textContent = 'Set a ' + (solvingFeat ? 'Featured' : 'Premium') + ' rate to see this quota';
-            note.innerHTML = '';
-          } else {
-            const need = Math.ceil(left / rate);
-            big.textContent = num.format(need);
-            (solvingFeat ? el.booked : el.sold).placeholder = num.format(need);
-            sub.textContent = solvingFeat ? pct(need, slots) + ' of your ' + num.format(slots) + ' slots at ' + usd.format(feat) + ' each'
-                                          : pct(need, vendors) + ' of your ' + num.format(vendors) + ' vendors at ' + usd.format(prem) + ' each';
-            note.innerHTML = need <= cap
-              ? '<span class="pill good">Your sales target</span><br>Sell ' + plural(solvingFeat ? sold : need, 'Premium upgrade') + ' and book ' +
-                plural(solvingFeat ? need : booked, 'featured slot') + ' to break even. Everything beyond that is profit.'
-              : '<span class="pill warn">Not reachable at these rates</span><br>You would need more ' + (solvingFeat ? 'featured slots than your fair has' : 'upgrades than you have vendors') +
-                '. Raise your rates or increase your expected ' + (solvingFeat ? 'Premium sales' : 'featured bookings') + '.';
-          }
+        const both = prem > 0 && feat > 0;
+        $('q-opt-both').hidden = !both;
+        if (both) {
+          const counts = [...new Set([0.25, 0.5, 0.75, 1].map(f => Math.max(1, Math.round(slots * f))))];
+          let reachable = 0;
+          $('q-both-rows').innerHTML = counts.map(n => {
+            const needP = Math.ceil(Math.max(0, license - n * feat) / prem);
+            const off = needP > vendors, free = needP === 0;
+            if (!off) reachable++;
+            const right = free ? '<b>0</b><small>Featured covers the license</small>'
+              : '<b>' + num.format(needP) + '</b><small>' + (off ? 'more than your ' + num.format(vendors) + ' vendors' : pct(needP, vendors) + ' of vendors') + '</small>';
+            return '<div class="q-tr' + (off ? ' off' : '') + (free ? ' free' : '') + '" role="row"><span role="cell"><b>' + num.format(n) +
+              '</b><small>' + pct(n, slots) + ' of ' + num.format(slots) + ' slots</small></span><span role="cell">' + right + '</span></div>';
+          }).join('');
+          note.innerHTML = reachable
+            ? '<span class="pill good">Pick your sales target</span><br>Choose the mix that feels realistic for your fair. Every sale beyond it is profit.'
+            : '<span class="pill warn">Not reachable at these rates</span><br>Even with every featured slot booked, you would need more Premium upgrades than you have vendors. Try raising your rates.';
         } else {
-          head.textContent = 'Upgrades needed to break even';
-          big.textContent = 'Pick one';
-          sub.textContent = 'Each option below covers the license with one upgrade type. Enter expected sales for one upgrade to see how many of the other you need.';
-          $('q-rows').hidden = true;
-          note.innerHTML = '';
+          const ok = premOnly !== null ? premOnly <= vendors : featOnly <= slots;
+          note.innerHTML = ok
+            ? '<span class="pill good">Your sales target</span><br>Add a rate for the other upgrade to see combinations of both.'
+            : '<span class="pill warn">Not reachable at this rate</span><br>Raise your rate, or add a rate for the other upgrade to see combinations of both.';
         }
       } else {
         // Pricing: up to three options at the visitor's expected sales.
@@ -763,16 +748,10 @@
       if (mode === 'pricing' && tab.dataset.mode !== 'pricing') {
         if (lastPlan) { el.prem.value = num.format(lastPlan.p); el.feat.value = num.format(lastPlan.f); }
       }
-      // Leaving Quota: keep the solved sales count as a real entry.
-      if (mode === 'quota' && tab.dataset.mode !== 'quota') {
-        [el.sold, el.booked].forEach(input => {
-          if (input.disabled && isFinite(raw({ value: input.placeholder }))) input.value = input.placeholder;
-        });
-      }
       mode = tab.dataset.mode;
       document.querySelectorAll('.calc-tab').forEach(t => t.setAttribute('aria-selected', t === tab));
       $('c-desc').innerHTML = DESC[mode];
-      $('c-sales-tip').hidden = mode !== 'quota';
+      $('c-sales-group').hidden = mode === 'quota';
       $('c-goal-wrap').hidden = mode !== 'pricing';
       $('c-rates-group').hidden = mode === 'pricing';
       $('c-ratio-group').hidden = mode !== 'pricing';
