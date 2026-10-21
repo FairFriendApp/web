@@ -224,7 +224,12 @@
   .calc{ max-width:1000px; margin:0 auto; background:#fff; border:1px solid var(--line); border-radius:24px; box-shadow:0 18px 44px rgba(8,25,45,.08);
          display:grid; grid-template-columns:1.05fr .95fr; overflow:hidden; }
   .calc-inputs{ padding:32px; }
-  .calc-tabs{ display:inline-flex; background:var(--tint); border:1px solid var(--line); border-radius:999px; padding:4px; margin-bottom:24px; }
+  .calc-tabs{ display:inline-flex; background:var(--tint); border:1px solid var(--line); border-radius:999px; padding:4px; margin-bottom:12px; }
+  .calc-top{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; margin-bottom:12px; }
+  .calc-top .calc-tabs{ margin-bottom:0; }
+  .calc-clear{ font-family:inherit; font-size:13px; font-weight:700; color:var(--muted); background:none; border:0; padding:6px 2px; cursor:pointer; text-decoration:underline; }
+  .calc-clear:hover{ color:var(--navy); }
+  .calc-desc{ font-size:14px; color:var(--muted); margin-bottom:24px; min-height:2.6em; }
   .calc-tab{ font-family:inherit; font-size:14px; font-weight:700; color:var(--navy); background:transparent; border:0; border-radius:999px; padding:9px 18px; cursor:pointer; }
   .calc-tab[aria-selected="true"]{ background:var(--navy); color:#fff; }
   .calc-group + .calc-group{ margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
@@ -260,6 +265,9 @@
   .calc-range:focus{ box-shadow:none; }
   .calc-link-btn{ font-family:inherit; font-size:12px; font-weight:700; color:var(--sky); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; }
   .calc-tip{ margin-top:12px; font-size:13px; color:var(--muted); background:var(--cream); border:1px solid #F1E3CC; border-radius:12px; padding:10px 12px; }
+  .calc-inputs input:disabled{ background:var(--tint); color:var(--muted); border-style:dashed; cursor:not-allowed; -webkit-text-fill-color:var(--muted); opacity:1; }
+  .calc-inputs input:disabled::placeholder{ color:var(--navy); font-weight:600; opacity:.75; }
+  .calc-solved{ display:inline-block; margin-left:4px; font-size:10.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--sky); background:#E6F2FB; border-radius:999px; padding:1px 8px; vertical-align:1px; }
   [hidden]{ display:none !important; }
   @media (max-width:860px){ .calc{ grid-template-columns:1fr; } }
   @media (max-width:480px){ .calc-inputs, .calc-results{ padding:24px 20px; } .calc-grid{ grid-template-columns:1fr; } }
@@ -487,11 +495,15 @@
 
     <div class="calc reveal" id="calc">
       <div class="calc-inputs">
+        <div class="calc-top">
         <div class="calc-tabs" role="tablist" aria-label="Calculator view">
           <button class="calc-tab" type="button" role="tab" aria-selected="true" data-mode="projection">Projection</button>
           <button class="calc-tab" type="button" role="tab" aria-selected="false" data-mode="quota">Quota</button>
           <button class="calc-tab" type="button" role="tab" aria-selected="false" data-mode="pricing">Pricing</button>
         </div>
+        <button type="button" class="calc-clear" id="c-clear">Clear all</button>
+        </div>
+        <p class="calc-desc" id="c-desc">See your projected profit. Enter your fair&rsquo;s details, your rates and how many upgrades you expect to sell.</p>
 
         <div class="calc-group">
           <h4>Your fair</h4>
@@ -527,15 +539,15 @@
           <h4>Your rates</h4>
           <div class="calc-grid">
             <div class="calc-field">
-              <label for="c-prem">Premium listing <span class="opt">(per event)</span></label>
+              <label for="c-prem">Premium listing <span class="opt">(per event)</span> <span class="calc-solved" id="c-prem-solved" hidden>Calculated</span></label>
               <div class="money"><input id="c-prem" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
             </div>
             <div class="calc-field">
-              <label for="c-feat">Featured spot <span class="opt">(per slot)</span></label>
+              <label for="c-feat">Featured spot <span class="opt">(per slot)</span> <span class="calc-solved" id="c-feat-solved" hidden>Calculated</span></label>
               <div class="money"><input id="c-feat" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
             </div>
           </div>
-          <p class="calc-tip" id="c-rates-tip" hidden>Enter the rate you&rsquo;re most sure of and leave the other blank. The calculator works out the rate you&rsquo;d need for the other.</p>
+          <p class="calc-tip" id="c-rates-tip" hidden>Enter the rate you&rsquo;re most sure of. The other field locks and shows the rate you&rsquo;d need to hit your goal. Clear your rate to unlock it.</p>
         </div>
 
         <div class="calc-group">
@@ -784,6 +796,17 @@
     let mode = 'projection';
     const target = $('c-target'), range = $('c-target-range');
     let targetDirty = false;   // false = target follows the license (break-even)
+    const DESC = {
+      projection: 'See your projected profit. Enter your fair&rsquo;s details, your rates and how many upgrades you expect to sell.',
+      quota: 'Set a sales target. Enter your fair&rsquo;s details, your rates and the featured slots you expect to book, and see how many Premium upgrades cover the license.',
+      pricing: 'Find your rates. Enter your fair&rsquo;s details, a revenue goal, your expected sales and one rate, and the calculator solves for the other.'
+    };
+    // In Pricing, the rate being solved is locked and shows the answer; elsewhere both rates are open.
+    function lockRate(input, tag, locked, shown){
+      input.disabled = locked;
+      input.placeholder = locked ? shown : '0';
+      tag.hidden = !locked;
+    }
 
     function calc(){
       const att = val(el.att), vendors = Math.round(val(el.vendors, 1)), days = Math.round(val(el.days, 1));
@@ -823,6 +846,9 @@
       $('r-projection').hidden = !ready || mode !== 'projection';
       $('r-quota').hidden = !ready || mode !== 'quota';
       $('r-pricing').hidden = !ready || mode !== 'pricing';
+      const pricing = mode === 'pricing', pHas = filled(el.prem), fHas = filled(el.feat);
+      lockRate(el.feat, $('c-feat-solved'), pricing && pHas && !fHas, 'Calculated');
+      lockRate(el.prem, $('c-prem-solved'), pricing && fHas && !pHas, 'Calculated');
       if (!ready) { $('r-note').innerHTML = ''; return; }
 
       const featRev = booked * feat;
@@ -889,6 +915,8 @@
         $('p-prem-only').textContent = premOnly === null ? 'add upgrades sold' : usd.format(premOnly) + ' each';
         $('p-feat-only').textContent = featOnly === null ? 'add slots booked' : usd.format(featOnly) + ' per slot';
         const pIn = filled(el.prem), fIn = filled(el.feat), big = $('p-big'), head = $('p-head'), sub = $('p-sub');
+        lockRate(el.feat, $('c-feat-solved'), pIn && !fIn, 'Calculated');
+        lockRate(el.prem, $('c-prem-solved'), fIn && !pIn, 'Calculated');
         big.classList.remove('neg');
         const summary = (p, f) => '<span class="pill good">Your pricing plan</span><br>Charge ' + usd.format(p) + ' for Premium and ' + usd.format(f) +
           ' per featured slot, sell ' + plural(sold, 'upgrade') + ' and book ' + plural(booked, 'slot') + ', and your fair nets about ' +
@@ -901,7 +929,9 @@
           head.textContent = 'Your rates bring in';
           big.textContent = usd.format(rev);
           sub.textContent = goal > 0 ? Math.round(rev / goal * 100) + '% of your target revenue' : '';
-          note.innerHTML = '<span class="pill warn">Both rates entered</span><br>Clear one rate and the calculator will work out what it needs to be to hit your goal.';
+          note.innerHTML = rev >= goal
+            ? '<span class="pill good">Goal reached</span><br>These rates hit your target revenue. To fine-tune, clear one rate and the calculator will solve for it again.'
+            : '<span class="pill warn">Short of your goal by ' + usd.format(goal - rev) + '</span><br>Clear one rate and the calculator will work out what it needs to be to hit your goal.';
         } else if (pIn || fIn) {
           const solvingFeat = pIn;
           const known = solvingFeat ? prem : feat, knownCount = solvingFeat ? sold : booked, otherCount = solvingFeat ? booked : sold;
@@ -914,10 +944,12 @@
             note.innerHTML = '<span class="pill warn">Add expected sales</span><br>Enter how many ' + (solvingFeat ? 'featured slots you expect to book' : 'Premium upgrades you expect to sell') + ' to solve for that rate.';
           } else if (needed <= 0) {
             big.textContent = usd.format(0);
+            (solvingFeat ? el.feat : el.prem).placeholder = '0';
             sub.textContent = (solvingFeat ? 'Premium' : 'Featured') + ' alone reaches your goal at ' + usd.format(known) + (solvingFeat ? ' each' : ' per slot');
             note.innerHTML = '<span class="pill good">Goal covered</span><br>Your ' + (solvingFeat ? 'Premium' : 'Featured') + ' sales already reach your target, so you can set the other rate wherever you like. Every sale is extra profit.';
           } else {
             const solved = Math.ceil(needed / otherCount);
+            (solvingFeat ? el.feat : el.prem).placeholder = num.format(solved);
             big.textContent = usd.format(solved) + unit;
             sub.textContent = 'With ' + (solvingFeat ? 'Premium at ' + usd.format(prem) + ' × ' + num.format(sold) : 'Featured at ' + usd.format(feat) + ' × ' + num.format(booked)) +
               ' and ' + (solvingFeat ? plural(booked, 'slot') + ' booked' : plural(sold, 'upgrade') + ' sold');
@@ -934,8 +966,15 @@
     }
 
     document.querySelectorAll('.calc-tab').forEach(tab => tab.addEventListener('click', () => {
+      // Leaving Pricing: keep the solved rate as a real entry so the other views use it.
+      if (mode === 'pricing' && tab.dataset.mode !== 'pricing') {
+        [el.prem, el.feat].forEach(input => {
+          if (input.disabled && isFinite(raw({ value: input.placeholder }))) input.value = input.placeholder;
+        });
+      }
       mode = tab.dataset.mode;
       document.querySelectorAll('.calc-tab').forEach(t => t.setAttribute('aria-selected', t === tab));
+      $('c-desc').innerHTML = DESC[mode];
       $('c-sold-wrap').hidden = mode === 'quota';
       $('c-goal-wrap').hidden = mode !== 'pricing';
       $('c-rates-tip').hidden = mode !== 'pricing';
@@ -955,6 +994,12 @@
     target.addEventListener('blur', () => { if (targetDirty && isFinite(raw(target))) target.value = num.format(raw(target)); calc(); });
     range.addEventListener('input', () => { targetDirty = true; target.value = num.format(Number(range.value)); calc(); });
     $('c-target-reset').addEventListener('click', () => { targetDirty = false; calc(); });
+    $('c-clear').addEventListener('click', () => {
+      Object.values(el).forEach(input => { input.value = ''; });
+      targetDirty = false;
+      calc();
+      el.att.focus();
+    });
     calc();
   })();
 
