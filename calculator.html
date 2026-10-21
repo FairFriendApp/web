@@ -580,6 +580,7 @@
     let mode = 'projection';
     const target = $('c-target'), range = $('c-target-range');
     let targetDirty = false;   // false = target follows the license (break-even)
+    let sliderMax = 0;         // current top of the target revenue slider
     const DESC = {
       projection: 'See your projected profit. Enter your fair&rsquo;s details, your rates and how many upgrades you expect to sell.',
       quota: 'Set a sales target. Enter your fair&rsquo;s details and your rates, and see how many Premium upgrades and featured slots you&rsquo;d need to sell to cover the license.',
@@ -614,9 +615,15 @@
       // Pricing goal: starts at break-even (the license) and follows attendance until the visitor changes it.
       if (!targetDirty && document.activeElement !== target) target.value = filled(el.att) ? num.format(license) : '';
       const goal = targetDirty ? val(target) : license;
-      const rangeMax = Math.max(1000, Math.ceil(Math.max(license * 5, goal) / 100) * 100);  // fixed scale so dragging doesn't stretch it
+      // Slider reaches 10× the license. A bigger goal typed into the box widens it to 1.5× that goal,
+      // so the handle isn't pinned at the end. Dragging never changes the scale.
+      const baseMax = Math.max(1000, Math.ceil(license * 10 / 100) * 100);
+      if (goal > sliderMax || sliderMax < baseMax || (!targetDirty)) sliderMax = goal > baseMax ? Math.ceil(goal * 1.5 / 100) * 100 : baseMax;
+      // Round steps (10, 25, 50, 100…) that divide the top evenly, so dragging lands on clean dollar amounts.
+      const rangeStep = [10, 25, 50, 100, 250, 500, 1000].find(st => sliderMax / st <= 400) || 1000;
+      const rangeMax = Math.ceil(sliderMax / rangeStep) * rangeStep;
       range.max = rangeMax;
-      range.step = Math.max(10, Math.round(rangeMax / 400 / 10) * 10);
+      range.step = rangeStep;
       range.value = goal;
       range.disabled = !filled(el.att);
       const goalNet = goal - license;
